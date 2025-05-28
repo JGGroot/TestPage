@@ -1,802 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Groots Designs - 3D CAD Innovation Hub</title>
-    <style>
-        :root {
-            --primary-purple: #6B46C1;
-            --secondary-purple: #8B5CF6;
-            --charcoal-light: #374151;
-            --charcoal-dark: #1F2937;
-            --rich-black: #111827;
-            --accent-cyan: #06B6D4;
-            --accent-gold: #F59E0B;
-            --glass-bg: rgba(139, 92, 246, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, var(--rich-black) 0%, var(--charcoal-dark) 50%, var(--primary-purple) 100%);
-            color: white;
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.3;
-        }
-
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: var(--secondary-purple);
-            border-radius: 50%;
-            animation: float 8s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
-            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.5; }
-        }
-
-        /* Header */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 1rem 2rem;
-            background: rgba(17, 24, 39, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, var(--secondary-purple), var(--accent-cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--secondary-purple);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .nav-links a:hover {
-            color: var(--secondary-purple);
-            transform: translateY(-2px);
-        }
-
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-content {
-            max-width: 800px;
-            z-index: 2;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .hero h1 {
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 900;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, var(--secondary-purple), var(--accent-cyan), var(--accent-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.3)); }
-            to { filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.6)); }
-        }
-
-        .hero p {
-            font-size: 1.25rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .cta-button {
-            display: inline-block;
-            padding: 1rem 2rem;
-            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .cta-button:hover::before {
-            left: 100%;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
-        }
-
-        .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-10px); }
-            60% { transform: translateX(-50%) translateY(-5px); }
-        }
-
-        /* Gallery Section */
-        .gallery {
-            padding: 8rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            font-size: 3rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 4rem;
-            background: linear-gradient(45deg, var(--secondary-purple), white);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .design-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 4rem;
-        }
-
-        .design-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .design-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .design-card:hover::before {
-            opacity: 0.1;
-        }
-
-        .design-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
-        }
-
-        .card-thumbnail {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, var(--charcoal-light), var(--primary-purple));
-            border-radius: 15px;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-thumbnail::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transition: all 0.5s ease;
-            transform: translate(-50%, -50%);
-        }
-
-        .design-card:hover .card-thumbnail::after {
-            width: 300px;
-            height: 300px;
-        }
-
-        .card-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .card-description {
-            opacity: 0.8;
-            margin-bottom: 1rem;
-        }
-
-        .card-tags {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .tag {
-            background: rgba(139, 92, 246, 0.2);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-        }
-
-        /* About Section */
-        .about {
-            padding: 8rem 2rem;
-            background: rgba(17, 24, 39, 0.5);
-            backdrop-filter: blur(20px);
-        }
-
-        .about-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .about h2 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            background: linear-gradient(45deg, var(--accent-cyan), var(--secondary-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .about p {
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
-            opacity: 0.9;
-        }
-
-        /* Contact Section */
-        .contact {
-            padding: 8rem 2rem;
-            max-width: 600px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .contact h2 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            background: linear-gradient(45deg, var(--accent-gold), var(--secondary-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .contact-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-        }
-
-        .form-group label {
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            padding: 1rem;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            color: white;
-            font-family: inherit;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--secondary-purple);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-        }
-
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .submit-btn {
-            padding: 1rem 2rem;
-            background: linear-gradient(45deg, var(--primary-purple), var(--secondary-purple));
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
-        }
-
-        /* Footer */
-        footer {
-            padding: 4rem 2rem 2rem;
-            text-align: center;
-            border-top: 1px solid var(--glass-border);
-            background: rgba(17, 24, 39, 0.8);
-            backdrop-filter: blur(20px);
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .social-links a {
-            color: white;
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: var(--secondary-purple);
-            transform: translateY(-3px);
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s ease;
-        }
-
-        .fade-in-up.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hero h1 {
-                font-size: 3rem;
-            }
-
-            .design-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .gallery,
-            .about,
-            .contact {
-                padding: 4rem 1rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Groots Designs - 3D CAD Innovation Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r148/three.min.js"></script>
+  <style>
+    :root {
+      --purple-dark: #6B46C1;
+      --purple-light: #8B5CF6;
+      --grey-dark: #1F2937;
+      --grey-mid: #374151;
+      --black: #111827;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --accent: #10B981;
+      --bg: var(--black);
+      --text: white;
+    }
+    [data-theme="light"] {
+      --bg: #f9fafb;
+      --text: #111827;
+      --glass-bg: rgba(0, 0, 0, 0.05);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      scroll-behavior: smooth;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+    nav a {
+      color: var(--text);
+      margin-left: 1.5rem;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    nav a:hover {
+      color: var(--purple-light);
+    }
+    .theme-toggle {
+      background: none;
+      border: 2px solid var(--text);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+    }
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to bottom right, var(--purple-dark), var(--bg));
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      width: 24px;
+      height: 40px;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(10px); }
+    }
+    .gallery {
+      padding: 6rem 2rem;
+      background-color: var(--grey-dark);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border-radius: 1rem;
+      overflow: hidden;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: scale(1.05) rotate3d(1, 1, 0, 10deg);
+      box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+    }
+    .viewer {
+      height: 400px;
+      width: 100%;
+      background: #000;
+    }
+  </style>
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="bg-animation" id="bgAnimation"></div>
+  <header>
+    <h1>Groots Designs</h1>
+    <nav>
+      <a href="#gallery">Gallery</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+    </nav>
+  </header>
+  <section class="hero">
+    <div>
+      <h1>Innovating the Future in 3D CAD</h1>
+      <p>Where Imagination Meets Precision</p>
+      <div class="scroll-indicator"></div>
+    </div>
+  </section>
+  <section class="viewer" id="viewer"></section>
+  <section id="gallery" class="gallery">
+    <div class="card">
+      <img src="https://via.placeholder.com/400x250" alt="Design Thumbnail">
+      <div class="card-content">
+        <h3>Fusion Mecharm</h3>
+        <p>Robotic arm optimized for industrial precision</p>
+        <div class="tags">#Robotics #Industrial</div>
+      </div>
+    </div>
+    <div class="card">
+      <img src="https://via.placeholder.com/400x250" alt="Design Thumbnail">
+      <div class="card-content">
+        <h3>AeroDrone X</h3>
+        <p>Lightweight, modular FPV drone frame</p>
+        <div class="tags">#Drones #Modular</div>
+      </div>
+    </div>
+  </section>
+  <section id="about" class="about">
+    <h2>About Groots Designs</h2>
+    <p>We’re reshaping what's possible in 3D design. Specializing in CAD modeling for rapid prototyping, product design, and mechanical inventions, we bring concepts to life with precision.</p>
+  </section>
+  <section id="contact" class="contact">
+    <h2>Contact Us</h2>
+    <form>
+      <input type="text" placeholder="Your Name" required />
+      <input type="email" placeholder="Your Email" required />
+      <textarea placeholder="Your Message" rows="5" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </section>
+  <footer>
+    &copy; 2025 Groots Designs. All rights reserved.
+  </footer>
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+    }
 
-    <!-- Header -->
-    <header>
-        <nav>
-            <div class="logo">Groots Designs</div>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#gallery">Gallery</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <h1>Groots Designs</h1>
-            <p>Revolutionizing 3D CAD Innovation Through Cutting-Edge Design Solutions</p>
-            <a href="#gallery" class="cta-button">Explore Our Universe</a>
-        </div>
-        <div class="scroll-indicator">
-            <div style="font-size: 2rem;">↓</div>
-        </div>
-    </section>
-
-    <!-- Gallery Section -->
-    <section class="gallery" id="gallery">
-        <h2 class="section-title fade-in-up">Featured Innovations</h2>
-        <div class="design-grid">
-            <div class="design-card fade-in-up">
-                <div class="card-thumbnail">🚀</div>
-                <div class="card-content">
-                    <h3 class="card-title">Aerospace Components</h3>
-                    <p class="card-description">Next-generation spacecraft components designed for optimal performance and efficiency.</p>
-                    <div class="card-tags">
-                        <span class="tag">Aerospace</span>
-                        <span class="tag">Engineering</span>
-                        <span class="tag">3D CAD</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="design-card fade-in-up">
-                <div class="card-thumbnail">🏗️</div>
-                <div class="card-content">
-                    <h3 class="card-title">Architectural Marvels</h3>
-                    <p class="card-description">Innovative building designs that blend sustainability with cutting-edge aesthetics.</p>
-                    <div class="card-tags">
-                        <span class="tag">Architecture</span>
-                        <span class="tag">Sustainable</span>
-                        <span class="tag">Design</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="design-card fade-in-up">
-                <div class="card-thumbnail">⚙️</div>
-                <div class="card-content">
-                    <h3 class="card-title">Mechanical Systems</h3>
-                    <p class="card-description">Precision-engineered mechanical components for industrial applications.</p>
-                    <div class="card-tags">
-                        <span class="tag">Mechanical</span>
-                        <span class="tag">Industrial</span>
-                        <span class="tag">Precision</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="design-card fade-in-up">
-                <div class="card-thumbnail">🧬</div>
-                <div class="card-content">
-                    <h3 class="card-title">Biomedical Devices</h3>
-                    <p class="card-description">Revolutionary medical devices designed to improve patient outcomes.</p>
-                    <div class="card-tags">
-                        <span class="tag">Biomedical</span>
-                        <span class="tag">Healthcare</span>
-                        <span class="tag">Innovation</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="design-card fade-in-up">
-                <div class="card-thumbnail">🌿</div>
-                <div class="card-content">
-                    <h3 class="card-title">Eco-Tech Solutions</h3>
-                    <p class="card-description">Environmentally conscious designs that promote sustainable technology.</p>
-                    <div class="card-tags">
-                        <span class="tag">Eco-Tech</span>
-                        <span class="tag">Green</span>
-                        <span class="tag">Future</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="design-card fade-in-up">
-                <div class="card-thumbnail">🤖</div>
-                <div class="card-content">
-                    <h3 class="card-title">Robotics Innovation</h3>
-                    <p class="card-description">Advanced robotic systems designed for automation and human assistance.</p>
-                    <div class="card-tags">
-                        <span class="tag">Robotics</span>
-                        <span class="tag">AI</span>
-                        <span class="tag">Automation</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section class="about" id="about">
-        <div class="about-content fade-in-up">
-            <h2>Crafting Tomorrow's Innovations</h2>
-            <p>At Groots Designs, we push the boundaries of what's possible in 3D CAD modeling and design innovation. Our team of visionary engineers and designers collaborate to create solutions that don't just meet today's needs, but anticipate tomorrow's challenges.</p>
-            <p>From aerospace components to sustainable architecture, our designs are characterized by precision, innovation, and a relentless pursuit of excellence. We believe that great design has the power to transform industries and improve lives.</p>
-            <p>Join us on our mission to revolutionize the world through cutting-edge design and engineering excellence.</p>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="contact" id="contact">
-        <h2 class="fade-in-up">Let's Create Together</h2>
-        <form class="contact-form fade-in-up">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" placeholder="Your Name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="your@email.com" required>
-            </div>
-            <div class="form-group">
-                <label for="project">Project Type</label>
-                <input type="text" id="project" name="project" placeholder="e.g. Aerospace, Architecture, Robotics">
-            </div>
-            <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" name="message" rows="5" placeholder="Tell us about your vision..." required></textarea>
-            </div>
-            <button type="submit" class="submit-btn">Launch Project</button>
-        </form>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="social-links">
-            <a href="#" aria-label="LinkedIn">💼</a>
-            <a href="#" aria-label="Twitter">🐦</a>
-            <a href="#" aria-label="GitHub">🔗</a>
-            <a href="#" aria-label="Instagram">📷</a>
-        </div>
-        <p>&copy; 2025 Groots Designs. Innovating the Future.</p>
-    </footer>
-
-    <script>
-        // Animated Background Particles
-        function createParticles() {
-            const bgAnimation = document.getElementById('bgAnimation');
-            const particleCount = 50;
-            
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
-                bgAnimation.appendChild(particle);
-            }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = 1;
+          entry.target.style.transform = 'translateY(0)';
         }
+      });
+    }, { threshold: 0.1 });
 
-        // Smooth Scrolling
-        function smoothScroll() {
-            const links = document.querySelectorAll('a[href^="#"]');
-            
-            links.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetId = link.getAttribute('href');
-                    const targetSection = document.querySelector(targetId);
-                    
-                    if (targetSection) {
-                        targetSection.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-        }
+    document.querySelectorAll('.card').forEach(el => {
+      el.style.opacity = 0;
+      el.style.transform = 'translateY(20px)';
+      observer.observe(el);
+    });
 
-        // Intersection Observer for Animations
-        function initScrollAnimations() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            });
+    // Three.js viewer setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 400, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, 400);
+    document.getElementById('viewer').appendChild(renderer.domElement);
 
-            document.querySelectorAll('.fade-in-up').forEach(el => {
-                observer.observe(el);
-            });
-        }
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ color: 0x8B5CF6, wireframe: true });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
 
-        // Header Scroll Effect
-        function initHeaderScroll() {
-            const header = document.querySelector('header');
-            
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 100) {
-                    header.style.background = 'rgba(17, 24, 39, 0.95)';
-                } else {
-                    header.style.background = 'rgba(17, 24, 39, 0.8)';
-                }
-            });
-        }
+    camera.position.z = 3;
 
-        // Enhanced Card Interactions
-        function initCardInteractions() {
-            const cards = document.querySelectorAll('.design-card');
-            
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', () => {
-                    card.style.transform = 'translateY(-10px) scale(1.02) rotateX(5deg)';
-                });
-                
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'translateY(0) scale(1) rotateX(0)';
-                });
-            });
-        }
-
-        // Form Submission
-        function initFormSubmission() {
-            const form = document.querySelector('.contact-form');
-            
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                // Simulate form submission
-                const submitBtn = form.querySelector('.submit-btn');
-                const originalText = submitBtn.textContent;
-                
-                submitBtn.textContent = 'Launching...';
-                submitBtn.disabled = true;
-                
-                setTimeout(() => {
-                    submitBtn.textContent = 'Mission Accomplished! ✨';
-                    setTimeout(() => {
-                        submitBtn.textContent = originalText;
-                        submitBtn.disabled = false;
-                        form.reset();
-                    }, 2000);
-                }, 1500);
-            });
-        }
-
-        // Add dynamic glow effect to CTA button
-        function initCTAGlow() {
-            const ctaButton = document.querySelector('.cta-button');
-            
-            setInterval(() => {
-                ctaButton.style.boxShadow = `0 0 ${Math.random() * 20 + 20}px rgba(139, 92, 246, ${Math.random() * 0.5 + 0.3})`;
-            }, 2000);
-        }
-
-        // Initialize all functions
-        document.addEventListener('DOMContentLoaded', () => {
-            createParticles();
-            smoothScroll();
-            initScrollAnimations();
-            initHeaderScroll();
-            initCardInteractions();
-            initFormSubmission();
-            initCTAGlow();
-        });
-
-        // Add parallax effect to hero section
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const parallaxElements = document.querySelectorAll('.hero-content');
-            
-            parallaxElements.forEach(element => {
-                const speed = 0.5;
-                element.style.transform = `translateY(${scrolled * speed}px)`;
-            });
-        });
-    </script>
+    function animate() {
+      requestAnimationFrame(animate);
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
 </body>
 </html>
