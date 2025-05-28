@@ -801,8 +801,10 @@
         <div class="design-grid">
             <div class="design-card fade-in-up">
                  <div class="card-thumbnail">
-                    <img src="1.PNG" alt="Aerospace Components" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;" onclick="openLightbox('2.PNG', 'Aerospace Components')"> 
-                 </div>
+                    <img src="1.PNG" alt="Aerospace Components" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;"
+                         onclick="openLightbox('1.PNG', 'Aerospace Components')">
+                    </div>
                 <div class="card-content">
                     <h3 class="card-title">Aerospace Components</h3>
                     <p class="card-description">Next-generation spacecraft components designed for optimal performance and efficiency.</p>
@@ -1101,7 +1103,8 @@ document.addEventListener('keydown', function(e) {
         
     </script>
 
-    <div class="lightbox" id="lightbox">
+  <!-- Lightbox Modal -->
+<div class="lightbox" id="lightbox">
     <div class="lightbox-content">
         <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
         <img class="lightbox-image" id="lightbox-image" src="" alt="">
