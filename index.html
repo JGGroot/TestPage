@@ -994,17 +994,21 @@
         }
 
         // Header Scroll Effect
-        function initHeaderScroll() {
-            const header = document.querySelector('header');
-            
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 100) {
-                    header.style.background = 'rgba(17, 24, 39, 0.95)';
-                } else {
-                    header.style.background = 'rgba(17, 24, 39, 0.8)';
-                }
-            });
+       function initHeaderScroll() {
+    const header = document.querySelector('header');
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+            header.style.background = 'rgba(17, 24, 39, 0.95)';
+            header.style.backdropFilter = 'blur(30px)';
+            header.style.webkitBackdropFilter = 'blur(30px)';
+        } else {
+            header.style.background = 'rgba(17, 24, 39, 0.8)';
+            header.style.backdropFilter = 'blur(20px)';
+            header.style.webkitBackdropFilter = 'blur(20px)';
         }
+    });
+}
 
         // Enhanced Card Interactions
         function initCardInteractions() {
