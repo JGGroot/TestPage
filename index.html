@@ -79,11 +79,11 @@
             -->
             <a-entity hand-controls="hand: right">
                 <!-- Child entity for raycaster and line, with rotation for alignment -->
-                <a-entity raycaster="objects: .collidable; showLine: true; far: 10" line="color: red; opacity: 0.75" rotation="-90 0 0"></a-entity>
+                <a-entity raycaster="objects: .collidable; showLine: true; far: 10" line="color: red; opacity: 0.75" rotation="-45 0 0"></a-entity>
             </a-entity>
             <a-entity hand-controls="hand: left">
                 <!-- Child entity for raycaster and line, with rotation for alignment -->
-                <a-entity raycaster="objects: .collidable; showLine: true; far: 10" line="color: blue; opacity: 0.75" rotation="-90 0 0"></a-entity>
+                <a-entity raycaster="objects: .collidable; showLine: true; far: 10" line="color: blue; opacity: 0.75" rotation="-45 0 0"></a-entity>
             </a-entity>
         </a-entity>
 
@@ -149,7 +149,7 @@
         -->
         <a-entity id="info-panel"
                   position="0 1.6 -1"
-                  visible="false"
+                  visible="true"
                   geometry="primitive: plane; width: 2; height: 1"
                   material="src: #info-panel-texture; transparent: true; opacity: 0.9"
                   text="value: Select a component for details.; align: center; width: 1.8; wrapCount: 20; color: #333">
@@ -157,7 +157,7 @@
                    position="0.9 0.4 0.05"
                    width="0.2" height="0.2" depth="0.05"
                    color="#E91E63"
-                   event-set__click="visible: false"
+                   event-set__click="visible: true"
                    text="value: X; align: center; width: 0.2; wrapCount: 1; color: white">
             </a-box>
         </a-entity>
