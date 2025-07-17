@@ -43,7 +43,8 @@
     <!-- The A-Frame scene where all 3D content resides -->
     <!-- Added renderer="ar: true" for passthrough on Quest devices -->
     <!-- Changed background to transparent for passthrough -->
-    <a-scene background="transparent" loading-screen="enabled: false" renderer="ar: true">
+    <!-- Added webxr component with optional features for better AR/passthrough support -->
+    <a-scene background="transparent" loading-screen="enabled: false" renderer="ar: true" webxr="optionalFeatures: local-floor, bounded-floor, hand-tracking, hit-test">
         <!--
             Assets management:
             Define all your assets (3D models, textures, sounds) here.
@@ -68,21 +69,21 @@
         -->
         <a-entity id="rig" movement-controls="speed: 0.1; fly: false" position="0 1.6 3">
             <a-camera look-controls="pointerLockEnabled: true">
-                <!-- Cursor for interaction: Removed raycaster from here as hand-controls will handle it -->
-                <a-cursor color="#FF0000" fuse="false"></a-cursor>
+                <!-- Cursor for interaction: Added raycaster back here to process controller clicks -->
+                <a-cursor raycaster="objects: .collidable" color="#FF0000" fuse="false"></a-cursor>
             </a-camera>
             <!--
-                Updated: Using hand-controls for both controller model and integrated raycasting.
-                Added rotation="-90 0 0" to align the controllers and laser forward.
+                Updated: Using hand-controls for both controller model.
+                The raycaster and line are now on a child entity with rotation.
                 - `hand-controls`: Automatically loads the correct controller model for the platform.
-                - `raycaster`: Attached directly to hand-controls for integrated interaction.
-                  `showLine: true` for debugging (makes the laser visible).
-                  `far: 10` ensures the ray reaches objects up to 10 units away.
-                - `line`: Visualizes the raycaster's line.
             -->
-            <a-entity hand-controls="hand: right" raycaster="objects: .collidable; showLine: true; far: 10" line="color: red; opacity: 0.75" rotation="-90 0 0">
+            <a-entity hand-controls="hand: right">
+                <!-- Child entity for raycaster and line, with rotation for alignment -->
+                <a-entity raycaster="objects: .collidable; showLine: true; far: 10" line="color: red; opacity: 0.75" rotation="-90 0 0"></a-entity>
             </a-entity>
-            <a-entity hand-controls="hand: left" raycaster="objects: .collidable; showLine: true; far: 10" line="color: blue; opacity: 0.75" rotation="-90 0 0">
+            <a-entity hand-controls="hand: left">
+                <!-- Child entity for raycaster and line, with rotation for alignment -->
+                <a-entity raycaster="objects: .collidable; showLine: true; far: 10" line="color: blue; opacity: 0.75" rotation="-90 0 0"></a-entity>
             </a-entity>
         </a-entity>
 
