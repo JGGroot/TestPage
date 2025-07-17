@@ -2,259 +2,317 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Aircraft Engine VR Visualization (A-Frame)</title>
+    <title>Quest 3 Passthrough VR Test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <!-- A-Frame CDN for easy inclusion -->
+    <!-- A-Frame CDN -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <!-- Optional: A-Frame Extras for more advanced controls like movement-controls -->
+    <!-- A-Frame Extras for movement controls -->
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.2.0/dist/aframe-extras.min.js"></script>
     <style>
-        /* Basic styling for the body to ensure full screen */
-        body { margin: 0; overflow: hidden; }
-        /* Style for the loading indicator */
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background: transparent;
+        }
+        
         #loading-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #333;
+            background-color: rgba(0, 0, 0, 0.8);
             color: white;
             display: flex;
-            flex-direction: column; /* Allow text and potential progress bar */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: 'Inter', sans-serif;
-            font-size: 2em;
+            font-family: 'Arial', sans-serif;
+            font-size: 1.5em;
             z-index: 9999;
         }
+        
         #loading-text {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        #enter-vr-button {
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        #enter-vr-button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <!-- Loading screen to show while assets are being loaded -->
     <div id="loading-screen">
-        <div id="loading-text">Loading VR Experience...</div>
-        <!-- You could add a progress bar here later -->
+        <div id="loading-text">Quest 3 Passthrough VR Ready</div>
+        <button id="enter-vr-button">Enter VR</button>
     </div>
 
-    <!-- The A-Frame scene where all 3D content resides -->
-    <!-- Added renderer="ar: true" for passthrough on Quest devices -->
-    <!-- Changed background to transparent for passthrough -->
-    <!-- Added webxr component with optional features for better AR/passthrough support -->
-    <a-scene background="transparent" loading-screen="enabled: false" renderer="ar: true" webxr="optionalFeatures: local-floor, bounded-floor, hand-tracking, hit-test">
-        <!--
-            Assets management:
-            Define all your assets (3D models, textures, sounds) here.
-            They will be preloaded before the scene starts, improving performance.
-            Replace 'placeholder-engine.glb' with the path to your actual engine model.
-        -->
+    <!-- A-Frame scene with Quest 3 passthrough support -->
+    <a-scene 
+        background="color: transparent"
+        loading-screen="enabled: false"
+        renderer="colorManagement: true; physicallyCorrectLights: true"
+        webxr="requiredFeatures: local-floor; optionalFeatures: bounded-floor, hand-tracking, hit-test; referenceSpaceType: local-floor"
+        vr-mode-ui="enabled: true">
+        
         <a-assets timeout="10000">
-            <!-- Example of loading a GLTF model. You would replace this with your engine model. -->
-            <!-- For a real engine, you'd use your actual .glb or .gltf file path -->
-            <a-asset-item id="engine-model" src="https://cdn.glitch.global/0638e4a9-6e3e-436f-821b-c19d4b0f983a/turbine_engine.glb?v=1708681123456"></a-asset-item>
-            <!-- You can add other assets like textures or sounds here -->
-            <img id="info-panel-texture" src="https://placehold.co/512x256/000000/FFFFFF?text=Engine+Info" crossorigin="anonymous">
+            <!-- Placeholder texture for info panels -->
+            <img id="info-bg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='256'%3E%3Crect width='512' height='256' fill='%23000000' opacity='0.8'/%3E%3C/svg%3E" crossorigin="anonymous">
         </a-assets>
 
-        <!--
-            Camera and Player Rig:
-            This sets up the user's viewpoint and interaction capabilities.
-            - `wasd-controls`: Enables movement using W, A, S, D keys (desktop) or joystick (VR).
-            - `look-controls`: Enables looking around using mouse (desktop) or head tracking (VR).
-            - `movement-controls`: (From aframe-extras) Provides more robust locomotion options.
-            - `position`: Sets the initial position of the user in the scene.
-        -->
-        <a-entity id="rig" movement-controls="speed: 0.1; fly: false" position="0 1.6 3">
-            <a-camera look-controls="pointerLockEnabled: true">
-                <!-- Cursor for interaction: Added raycaster back here to process controller clicks -->
-                <a-cursor raycaster="objects: .collidable" color="#FF0000" fuse="false"></a-cursor>
+        <!-- Camera rig with Quest 3 optimized settings -->
+        <a-entity id="rig" 
+                  movement-controls="speed: 0.1; fly: false"
+                  position="0 1.6 2">
+            
+            <!-- Camera with proper Quest 3 settings -->
+            <a-camera 
+                look-controls="pointerLockEnabled: false"
+                wasd-controls="enabled: false">
+                
+                <!-- Desktop cursor for testing -->
+                <a-cursor 
+                    raycaster="objects: .interactive; far: 10"
+                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                    material="color: #FF0000; shader: flat"
+                    visible="true">
+                </a-cursor>
             </a-camera>
-            <!--
-                Updated: Using hand-controls for both controller model.
-                The raycaster and line are now on a child entity with rotation.
-                - `hand-controls`: Automatically loads the correct controller model for the platform.
-            -->
-            <a-entity hand-controls="hand: right">
-                <!-- Child entity for raycaster and line, with rotation for alignment -->
-                <a-entity raycaster="objects: .collidable; showLine: true; far: 10" line="color: red; opacity: 0.75" rotation="-45 0 0"></a-entity>
+
+            <!-- Right hand controller -->
+            <a-entity 
+                id="right-hand"
+                hand-controls="hand: right; handModelStyle: lowPoly; color: #ffcccc"
+                raycaster="objects: .interactive; far: 10; showLine: true; lineColor: #FF0000; lineOpacity: 0.8"
+                line="color: #FF0000; opacity: 0.8; visible: true"
+                controller-interaction>
             </a-entity>
-            <a-entity hand-controls="hand: left">
-                <!-- Child entity for raycaster and line, with rotation for alignment -->
-                <a-entity raycaster="objects: .collidable; showLine: true; far: 10" line="color: blue; opacity: 0.75" rotation="-45 0 0"></a-entity>
+
+            <!-- Left hand controller -->
+            <a-entity 
+                id="left-hand"
+                hand-controls="hand: left; handModelStyle: lowPoly; color: #ffcccc"
+                raycaster="objects: .interactive; far: 10; showLine: true; lineColor: #0000FF; lineOpacity: 0.8"
+                line="color: #0000FF; opacity: 0.8; visible: true"
+                controller-interaction>
             </a-entity>
         </a-entity>
 
-        <!--
-            Aircraft Engine Model:
-            Load your GLTF/GLB model here.
-            - `gltf-model`: Component to load GLTF/GLB assets.
-            - `position`, `rotation`, `scale`: Adjust these to place and size your model correctly.
-            - `class="collidable"`: Marks the model as interactable for the raycaster/cursor.
-            - `id="engine"`: Gives it a unique ID for scripting.
-        -->
-        <a-entity id="engine"
-                  gltf-model="#engine-model"
-                  position="0 0.5 -2"
-                  rotation="0 45 0"
-                  scale="1 1 1"
-                  class="collidable">
-            <!-- You can add child entities here to represent specific engine components -->
-            <a-box id="compressor-section"
-                   position="0.5 0 0"
-                   width="0.8" height="0.8" depth="0.8"
-                   color="#4CAF50"
-                   opacity="0.5"
-                   visible="false"
-                   class="collidable">
-                <a-text value="Compressor Section" position="0 0 0.45" align="center" color="white"></a-text>
-            </a-box>
-            <a-box id="turbine-section"
-                   position="-0.5 0 0"
-                   width="0.8" height="0.8" depth="0.8"
-                   color="#FF9800"
-                   opacity="0.5"
-                   visible="false"
-                   class="collidable">
-                <a-text value="Turbine Section" position="0 0 0.45" align="center" color="white"></a-text>
-            </a-box>
-        </a-entity>
+        <!-- Interactive boxes positioned around the user -->
+        <a-box 
+            id="box-1"
+            position="-2 1.6 -2"
+            width="0.5" height="0.5" depth="0.5"
+            color="#FF5733"
+            class="interactive"
+            box-info="title: Red Box; description: This is the red information box. Click to interact with VR elements.">
+        </a-box>
 
-        <!-- New: Four clickable cubes -->
-        <a-box id="cube-1" position="-2 1.6 -3" color="#FF5733" class="collidable" interactive-component></a-box>
-        <a-box id="cube-2" position="2 1.6 -3" color="#33FF57" class="collidable" interactive-component></a-box>
-        <a-box id="cube-3" position="-3 1.6 0" color="#3357FF" class="collidable" interactive-component></a-box>
-        <a-box id="cube-4" position="3 1.6 0" color="#FF33FF" class="collidable" interactive-component></a-box>
+        <a-box 
+            id="box-2"
+            position="2 1.6 -2"
+            width="0.5" height="0.5" depth="0.5"
+            color="#33FF57"
+            class="interactive"
+            box-info="title: Green Box; description: This green box demonstrates Quest 3 passthrough interaction capabilities.">
+        </a-box>
 
-        <!--
-            Ground Plane:
-            A simple plane for the user to stand on and provide a sense of scale.
-        -->
-        <a-plane position="0 0 -4" rotation="-90 0 0" width="10" height="10" color="#7BC8A4"></a-plane>
+        <a-box 
+            id="box-3"
+            position="-2 1.6 0"
+            width="0.5" height="0.5" depth="0.5"
+            color="#3357FF"
+            class="interactive"
+            box-info="title: Blue Box; description: Hand tracking and controller input work seamlessly in mixed reality.">
+        </a-box>
 
-        <!--
-            Lighting:
-            Essential for making your 3D model visible and look good.
-            - `ambient-light`: Provides general, non-directional illumination.
-            - `directional-light`: Simulates sunlight, creating shadows.
-        -->
-        <a-entity light="type: ambient; color: #BBBBBB"></a-entity>
-        <a-entity light="type: directional; color: #FFFFFF; intensity: 0.8" position="-1 1 1"></a-entity>
+        <a-box 
+            id="box-4"
+            position="2 1.6 0"
+            width="0.5" height="0.5" depth="0.5"
+            color="#FF33FF"
+            class="interactive"
+            box-info="title: Purple Box; description: Experience the future of mixed reality with Quest 3 passthrough.">
+        </a-box>
 
-        <!--
-            Interactive Info Panel (initially hidden)
-            This panel will appear when a component is interacted with.
-        -->
-        <a-entity id="info-panel"
-                  position="0 1.6 -1"
-                  visible="true"
-                  geometry="primitive: plane; width: 2; height: 1"
-                  material="src: #info-panel-texture; transparent: true; opacity: 0.9"
-                  text="value: Select a component for details.; align: center; width: 1.8; wrapCount: 20; color: #333">
-            <a-box class="collidable"
-                   position="0.9 0.4 0.05"
-                   width="0.2" height="0.2" depth="0.05"
-                   color="#E91E63"
-                   event-set__click="visible: true"
-                   text="value: X; align: center; width: 0.2; wrapCount: 1; color: white">
+        <!-- Info panel template (initially hidden) -->
+        <a-entity 
+            id="info-panel"
+            position="0 2.5 -1"
+            visible="false"
+            geometry="primitive: plane; width: 2; height: 1"
+            material="src: #info-bg; transparent: true; opacity: 0.9"
+            text="value: Default Info; align: center; width: 4; wrapCount: 30; color: white; font: dejavu">
+            
+            <!-- Close button -->
+            <a-box 
+                id="close-button"
+                position="0.9 0.4 0.01"
+                width="0.15" height="0.15" depth="0.02"
+                color="#FF4444"
+                class="interactive"
+                geometry="primitive: box"
+                text="value: X; align: center; width: 8; color: white; font: dejavu">
             </a-box>
         </a-entity>
 
-        <!-- JavaScript for interaction logic -->
+        <!-- Lighting optimized for mixed reality -->
+        <a-entity light="type: ambient; color: #FFFFFF; intensity: 0.6"></a-entity>
+        <a-entity light="type: directional; color: #FFFFFF; intensity: 0.8; castShadow: true" position="2 4 2"></a-entity>
+
+        <!-- Custom components and interaction logic -->
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const loadingScreen = document.getElementById('loading-screen');
-                const loadingText = document.getElementById('loading-text');
-                const scene = document.querySelector('a-scene');
-                const infoPanel = document.getElementById('info-panel');
-                const infoPanelText = infoPanel.querySelector('a-text');
-
-                // Function to update loading text
-                function updateLoadingText(message) {
-                    loadingText.textContent = message;
-                }
-
-                // Hide loading screen once the scene is loaded
-                scene.addEventListener('loaded', function () {
-                    loadingScreen.style.display = 'none';
-                    console.log('A-Frame scene loaded!');
+            // Wait for A-Frame to load before registering components
+            if (typeof AFRAME !== 'undefined') {
+                registerComponents();
+            } else {
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Wait a bit more for A-Frame to fully initialize
+                    setTimeout(registerComponents, 100);
                 });
+            }
 
-                // Listen for asset loading errors
-                const assets = document.querySelector('a-assets');
-                assets.addEventListener('asset-load-error', function (event) {
-                    const assetId = event.detail.id || event.detail.src;
-                    updateLoadingText(`Error loading asset: ${assetId}. Please check the URL and ensure CORS is configured.`);
-                    console.error('Asset load error:', event.detail);
-                });
-
-                // Custom component for basic interaction (e.g., clicking on a component)
-                AFRAME.registerComponent('interactive-component', {
+            function registerComponents() {
+                // Custom component for box information
+                AFRAME.registerComponent('box-info', {
+                    schema: {
+                        title: { type: 'string', default: 'Info' },
+                        description: { type: 'string', default: 'No description available.' }
+                    },
+                    
                     init: function () {
-                        const el = this.el; // Reference to the entity this component is attached to
-
-                        el.addEventListener('click', function (evt) {
-                            const componentId = el.id;
-                            let infoText = 'No information available.';
-
-                            // Determine information based on the clicked component
-                            if (componentId === 'engine') {
-                                infoText = 'This is the main aircraft engine model. Explore its internal components!';
-                            } else if (componentId === 'compressor-section') {
-                                infoText = 'The compressor section compresses air before it enters the combustion chamber.';
-                            } else if (componentId === 'turbine-section') {
-                                infoText = 'The turbine section extracts energy from the hot exhaust gases to drive the compressor.';
-                            } else if (componentId.startsWith('cube-')) { // Check for the new cubes
-                                infoText = 'Hello!';
-                            }
-
-                            // Update and show the info panel
-                            infoPanelText.setAttribute('value', infoText);
-                            infoPanel.setAttribute('visible', true);
-                            // Position the info panel relative to the camera for better visibility
-                            const camera = document.querySelector('a-camera');
-                            const cameraWorldPos = camera.object3D.getWorldPosition(new THREE.Vector3());
-                            const cameraWorldRot = camera.object3D.getWorldQuaternion(new THREE.Quaternion());
-
-                            // Position the panel slightly in front of the camera
-                            const direction = new THREE.Vector3(0, 0, -1);
-                            direction.applyQuaternion(cameraWorldRot);
-                            direction.multiplyScalar(1.5); // Distance in front of camera
-                            infoPanel.object3D.position.copy(cameraWorldPos).add(direction);
-
-                            // Make the panel face the camera
-                            infoPanel.object3D.lookAt(cameraWorldPos);
-                        });
-
-                        // Optional: Add hover effects
+                        const el = this.el;
+                        const data = this.data;
+                        
+                        // Add hover effects
                         el.addEventListener('mouseenter', function () {
-                            // Example: Change color or scale on hover
-                            // el.setAttribute('material', 'color', '#AA00AA');
+                            el.setAttribute('scale', '1.1 1.1 1.1');
+                            el.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 2000; loop: true');
                         });
+                        
                         el.addEventListener('mouseleave', function () {
-                            // Example: Revert color or scale
-                            // el.setAttribute('material', 'color', '#4CAF50');
+                            el.setAttribute('scale', '1 1 1');
+                            el.removeAttribute('animation');
+                        });
+                        
+                        // Click handler
+                        el.addEventListener('click', function (evt) {
+                            const infoPanel = document.getElementById('info-panel');
+                            const infoText = infoPanel.querySelector('a-text');
+                            
+                            // Update info panel content
+                            const fullText = `${data.title}\n\n${data.description}`;
+                            infoText.setAttribute('value', fullText);
+                            
+                            // Position info panel above the clicked box
+                            const boxPosition = el.getAttribute('position');
+                            infoPanel.setAttribute('position', {
+                                x: boxPosition.x,
+                                y: boxPosition.y + 1,
+                                z: boxPosition.z
+                            });
+                            
+                            // Show the panel
+                            infoPanel.setAttribute('visible', true);
+                            
+                            // Make panel face the camera
+                            const camera = document.querySelector('a-camera');
+                            infoPanel.object3D.lookAt(camera.object3D.position);
+                            
+                            console.log(`Clicked on ${data.title}`);
                         });
                     }
                 });
 
-                // Apply the interactive-component to the engine and its sub-components
-                document.getElementById('engine').setAttribute('interactive-component', '');
-                document.getElementById('compressor-section').setAttribute('interactive-component', '');
-                document.getElementById('turbine-section').setAttribute('interactive-component', '');
+                // Controller interaction component
+                AFRAME.registerComponent('controller-interaction', {
+                    init: function () {
+                        const el = this.el;
+                        
+                        // Handle controller trigger/select events
+                        el.addEventListener('triggerdown', function (evt) {
+                            const intersectedEl = evt.detail.intersectedEl;
+                            if (intersectedEl && intersectedEl.classList.contains('interactive')) {
+                                intersectedEl.click();
+                            }
+                        });
+                        
+                        // Handle controller grip events
+                        el.addEventListener('gripdown', function (evt) {
+                            console.log('Grip pressed on controller');
+                        });
+                    }
+                });
+            }
 
-                // Apply the interactive-component to the new cubes
-                document.getElementById('cube-1').setAttribute('interactive-component', '');
-                document.getElementById('cube-2').setAttribute('interactive-component', '');
-                document.getElementById('cube-3').setAttribute('interactive-component', '');
-                document.getElementById('cube-4').setAttribute('interactive-component', '');
+            // Initialize the application
+            document.addEventListener('DOMContentLoaded', function () {
+                const loadingScreen = document.getElementById('loading-screen');
+                const enterVRButton = document.getElementById('enter-vr-button');
+                const scene = document.querySelector('a-scene');
+                const infoPanel = document.getElementById('info-panel');
+                const closeButton = document.getElementById('close-button');
 
+                // Enter VR button handler
+                enterVRButton.addEventListener('click', function () {
+                    loadingScreen.style.display = 'none';
+                    
+                    // Check if VR is available
+                    if (navigator.xr) {
+                        navigator.xr.isSessionSupported('immersive-vr').then(function (supported) {
+                            if (supported) {
+                                console.log('VR supported - Ready for Quest 3!');
+                            } else {
+                                console.log('VR not supported on this device');
+                            }
+                        });
+                    }
+                });
 
-                // Hide the info panel when the 'X' button on the panel is clicked
-                infoPanel.querySelector('a-box').addEventListener('click', function() {
+                // Close button handler
+                closeButton.addEventListener('click', function () {
                     infoPanel.setAttribute('visible', false);
+                });
+
+                // Scene loaded handler
+                scene.addEventListener('loaded', function () {
+                    console.log('A-Frame scene loaded and ready!');
+                    
+                    // Check for WebXR support
+                    if ('xr' in navigator) {
+                        console.log('WebXR is supported');
+                    } else {
+                        console.log('WebXR is not supported');
+                    }
+                });
+
+                // Handle VR mode changes
+                scene.addEventListener('enter-vr', function () {
+                    console.log('Entered VR mode');
+                    // Hide desktop cursor in VR
+                    document.querySelector('a-cursor').setAttribute('visible', false);
+                });
+
+                scene.addEventListener('exit-vr', function () {
+                    console.log('Exited VR mode');
+                    // Show desktop cursor when not in VR
+                    document.querySelector('a-cursor').setAttribute('visible', true);
+                });
+
+                // Error handling
+                scene.addEventListener('error', function (error) {
+                    console.error('A-Frame error:', error);
                 });
             });
         </script>
