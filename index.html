@@ -70,14 +70,18 @@
                 <!-- Cursor for interaction: A simple ring that appears when pointing -->
                 <a-cursor raycaster="objects: .collidable" color="#FF0000" fuse="false"></a-cursor>
             </a-camera>
-            <!-- Right hand controller with laser pointer and grab functionality -->
-            <a-entity laser-controls="hand: right" raycaster="objects: .collidable" line="opacity: 0.5; color: #FF0000">
-                <!-- Visual representation of the controller -->
-                <a-entity oculus-touch-controls="hand: right" vive-controls="hand: right" windows-mixed-reality-controls="hand: right"></a-entity>
+            <!--
+                Updated: Using hand-controls for both controller model and integrated raycasting.
+                This should improve alignment and click detection.
+                - `hand-controls`: Automatically loads the correct controller model for the platform.
+                - `raycaster`: Attached directly to hand-controls for integrated interaction.
+                  `showLine: true` for debugging (makes the laser visible).
+                  `far: 10` ensures the ray reaches objects up to 10 units away.
+                - `line`: Visualizes the raycaster's line.
+            -->
+            <a-entity hand-controls="hand: right" raycaster="objects: .collidable; showLine: true; far: 10" line="color: red; opacity: 0.75">
             </a-entity>
-            <!-- Left hand controller (optional, for two-handed interactions) -->
-            <a-entity laser-controls="hand: left" raycaster="objects: .collidable" line="opacity: 0.5; color: #00FF00">
-                <a-entity oculus-touch-controls="hand: left" vive-controls="hand: left" windows-mixed-reality-controls="hand: left"></a-entity>
+            <a-entity hand-controls="hand: left" raycaster="objects: .collidable; showLine: true; far: 10" line="color: blue; opacity: 0.75">
             </a-entity>
         </a-entity>
 
