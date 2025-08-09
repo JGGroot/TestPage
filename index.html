@@ -1,321 +1,1300 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Quest 3 Passthrough VR Test</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <!-- A-Frame CDN -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <!-- A-Frame Extras for movement controls -->
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.2.0/dist/aframe-extras.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USAF AI Prompt Generator</title>
+    <!-- Tailwind CSS for layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            background: transparent;
+        /* --- Custom Styles for a Sleek, Modern Refresh --- */
+        :root {
+            --bg-dark: #09090b;
+            --card-bg: rgba(39, 39, 42, 0.5);
+            --border-color: rgba(161, 161, 170, 0.2);
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --primary-purple: #a855f7;
+            --primary-cyan: #22d3ee;
+            --accent-purple-muted: #c084fc;
+            --input-bg: rgba(24, 24, 27, 0.7);
+            --success-color: #2ecc71;
         }
-        
-        #loading-screen {
-            position: fixed;
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.1), transparent 70%);
+            color: var(--text-primary);
+            padding-top: 4rem; /* Space for the sticky header */
+        }
+
+        /* --- Sticky Header --- */
+        .header {
+            position: sticky;
             top: 0;
-            left: 0;
+            z-index: 50;
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 0 1rem;
+        }
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            height: 4rem;
             align-items: center;
-            font-family: 'Arial', sans-serif;
-            font-size: 1.5em;
-            z-index: 9999;
+            justify-content: space-between;
         }
-        
-        #loading-text {
-            margin-bottom: 20px;
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
-        #enter-vr-button {
-            padding: 15px 30px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2em;
+        .logo {
+            height: 2.5rem;
+            width: auto;
+        }
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Gradient Header Text for the main title */
+        h1.main-title {
+            background: linear-gradient(to right, var(--text-primary), var(--accent-purple-muted));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* --- Card Styles --- */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+        }
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 1.125rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* --- Form & Input Styles --- */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .custom-picker-input, .custom-dropdown-selected {
+             background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
             cursor: pointer;
-            margin-top: 20px;
+        }
+        .custom-picker-input:hover, .custom-dropdown-selected:hover {
+            border-color: var(--primary-purple);
+        }
+        .custom-dropdown-selected {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .custom-dropdown-selected::after {
+            content: '▼';
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+        }
+        .floating-dropdown-options {
+            position: absolute;
+            background-color: #18181b;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .floating-dropdown-option {
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .floating-dropdown-option:hover {
+            background-color: rgba(168, 85, 247, 0.1);
+        }
+        .floating-dropdown-option.selected {
+            background-color: rgba(168, 85, 247, 0.2);
+            font-weight: 600;
+        }
+
+        /* --- Button Styles --- */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-cyan));
+            color: white;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+        .btn-success {
+             background-color: var(--success-color);
+             color: white;
+        }
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+        /* --- ALQ Checkbox Styles --- */
+        .alq-container {
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        .alq-group {
+            margin-bottom: 1.5rem;
+        }
+        .alq-header {
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .alq-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .alq-option {
+            position: relative;
+        }
+        .alq-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        .alq-label {
+            display: flex;
+            align-items: center;
+            background-color: var(--input-bg);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .alq-option input[type="checkbox"]:checked ~ .alq-label {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        }
+        .alq-checkmark {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background-color: transparent;
+            border: 2px solid var(--text-secondary);
+            border-radius: 4px;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .alq-option input[type="checkbox"]:checked ~ .alq-label .alq-checkmark {
+            background-color: var(--primary-purple);
+            border-color: var(--primary-purple);
+        }
+        .alq-option input[type="checkbox"]:checked ~ .alq-label .alq-checkmark::after {
+            content: '';
+            position: absolute;
+            display: block;
+            top: 2px;
+            left: 5px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* --- Other Styles --- */
+        .toggle-section {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            opacity: 0.7;
+        }
+        .toggle-section:hover {
+            opacity: 1;
+            background-color: rgba(168, 85, 247, 0.1);
+        }
+        .reference-section {
+            background-color: rgba(168, 85, 247, 0.05);
+            border-left: 4px solid var(--primary-purple);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .example-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: var(--input-bg);
+            border-left: 3px solid var(--primary-cyan);
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .alq-desc-btn {
+            background: none;
+            border: none;
+            color: var(--primary-purple);
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            padding: 0;
+            margin-top: 1rem;
+            transition: color 0.2s;
+            display: inline-block;
+        }
+        .alq-desc-btn:hover {
+            color: var(--primary-cyan);
+        }
+        .alq-desc-container {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: rgba(168, 85, 247, 0.05);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+        .ai-resource-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-cyan));
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin: 0 0.5rem;
+            min-width: 150px;
+        }
+        .ai-resource-link:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .ai-resource-icon {
+            margin-right: 0.5rem;
+            font-size: 1.2em;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .description-text {
+            text-align: center;
+            margin: 1rem 0;
+            color: var(--text-secondary);
+        }
+        .output-box {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            white-space: pre-wrap;
+            font-family: 'Menlo', 'Monaco', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+        .hidden { display: none; }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
         }
         
-        #enter-vr-button:hover {
-            background-color: #45a049;
+        /* --- Picker Modal Styles --- */
+        .picker-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .picker-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .picker-modal {
+            background-color: #18181b;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 20rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+        .picker-overlay.visible .picker-modal {
+            transform: scale(1);
+        }
+        .picker-container {
+            height: 12rem;
+            overflow: hidden;
+            position: relative;
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+            mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+        }
+        .picker-highlight {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3rem;
+            transform: translateY(-50%);
+            background-color: rgba(168, 85, 247, 0.1);
+            border-top: 1px solid var(--primary-purple);
+            border-bottom: 1px solid var(--primary-purple);
+            border-radius: 0.25rem;
+        }
+        .picker-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            transform: translateY(0);
+            touch-action: none;
+        }
+        .picker-list li {
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            transition: color 0.2s;
         }
     </style>
 </head>
 <body>
-    <div id="loading-screen">
-        <div id="loading-text">Quest 3 Passthrough VR Ready</div>
-        <button id="enter-vr-button">Enter VR</button>
+    <!-- Sticky Header -->
+    <header class="header">
+        <div class="header-container">
+            <a href="https://royal-spark.github.io/Landing-Page/" style="text-decoration: none;">
+				<div class="logo-container">
+					<img src="https://dwtymuzolmglgyejxuve.supabase.co/storage/v1/object/public/podcasts//Royal%20Spark%20D%20Logo%20-%20Mekvold%20V3.png" alt="Royal Spark Logo" style="height: 2.5rem; width: auto;">
+					<span style="font-size: 1.25rem; font-weight: 700; background: linear-gradient(to right, var(--primary-purple), var(--primary-cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; margin-left: 0.5rem;">Royal Spark</span>
+				</div>
+			</a>
+        </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto p-4 sm:p-6">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold main-title">USAF AI Prompt Generator</h1>
+            <p class="text-sm text-slate-400 mt-1">Turn accomplishments into powerful performance statements.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>How to Use This Tool</span>
+                <button id="howToUseToggle" class="toggle-section">ⓘ Show Instructions</button>
+            </div>
+            <div id="howToUseBody" class="card-body hidden">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Purpose: Get 80% of your performance statements done in minutes!</h2>
+                <p style="margin-bottom: 1rem;">Our AI tool empowers every Airman to rapidly turn their accomplishments into strong, AFI-structured performance statements. This saves time for both Airmen and supervisors, leading to faster, higher-quality 1206s.</p>
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Step-by-Step Guide:</h2>
+                <ol style="list-style: decimal; padding-left: 1.5rem; line-height: 1.8;">
+                    <li><strong>Step 1:</strong> Input Your Accomplishments: Simply type in all your details and "word vomit" your achievements.</li>
+                    <li><strong>Step 2:</strong> Generate Prompt: Click the "generate prompt" button to create your AI-ready text.</li>
+                    <li><strong>Step 3:</strong> Paste & Generate: Copy the prompt and paste it into NIPRGPT or ASK SAGE to get 7 drafted performance statements.</li>
+                    <li><strong>Step 4:</strong> Select & Refine: Review the 7 AI-generated statements and select the best parts to provide to your supervisor.</li>
+                    <li><strong>Step 5:</strong> Supervisor Review: Your supervisor refines the chosen statements for final perfection.</li>
+                </ol>
+                <p style="text-align: center; margin-top: 1.5rem;">That's it! Get high-quality, AFI-structured performance statements in minutes.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>Input Information</span>
+                <button id="toggleReference" class="toggle-section">ⓘ Show Guidance</button>
+            </div>
+            <div id="referenceSection" class="reference-section hidden">
+                <h3 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Official USAF Performance Statement Guidance:</h3>
+                <p style="margin-bottom: 1rem;">Performance Statements are the AF narrative-style of writing to communicate performance on the AF Form 1206, Nomination for Award (13 Mar 2024). They are efficient, increase clarity, and improve the ability to understand an Airman's performance correctly and equitably.</p>
+                
+                <h4 style="font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">Two Basic Principles:</h4>
+                <ul style="list-style: disc; padding-left: 1.5rem; margin-bottom: 1rem;">
+                    <li><strong>Standalone:</strong> Each Performance Statement is a standalone sentence and includes 1) action and 2) at least one of the following: impact or results/outcome.</li>
+                    <li><strong>Readability:</strong> Performance Statements are plain language and avoid using uncommon acronyms and abbreviations.</li>
+                </ul>
+                
+                <h4 style="font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">Format:</h4>
+                <ul style="list-style: disc; padding-left: 1.5rem; margin-bottom: 1rem;">
+                    <li>AF Form 1206, Nomination for Award (13 Mar 2024) remains the standard</li>
+                    <li>White space on the right margin is both accepted and expected</li>
+                    <li>No award nomination criteria may exceed one full page</li>
+                    <li>Bullets are not authorized</li>
+                </ul>
+                
+                <div class="example-box">
+                    <h4 style="font-weight: 600; margin-bottom: 0.75rem;">Example:</h4>
+                    <p><strong>Action and Impact or Results/Outcome:</strong></p>
+                    <p>Capt Snuffy <strong>led</strong> a survey team of 33 MCA to establish an XAB in support of a PACAF ACE exercise across 4 countries and including 7 allies, <strong>culminating</strong> in 153 sorties and 334 training events completed. She also <strong>championed</strong> a critical organizational merger of the squadron's maintenance and operations; results <strong>saved</strong> 360 maintenance workhours per week and <strong>increased</strong> sortie generation by 10%.</p>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="jobTitleContainer">Job Title/AFSC:</label>
+                        <div id="jobTitleContainer"></div>
+                    </div>
+                    <div id="otherJobField" class="form-group hidden">
+                        <label for="otherJobTitle">Specify Job Title:</label>
+                        <input type="text" id="otherJobTitle" placeholder="e.g., Program Manager">
+                    </div>
+                     <div class="form-group">
+                        <label for="majcomContainer">MAJCOM:</label>
+                        <div id="majcomContainer"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mgaContainer">Major Graded Area (MGA):</label>
+                        <div id="mgaContainer"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="purposeContainer">Purpose:</label>
+                        <div id="purposeContainer"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="accomplishment">Accomplishment Details:</label>
+                    <textarea id="accomplishment" placeholder="Describe what you did with metrics in any format: bullet points, notes, sentences, or even stream of consciousness."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Airman Leadership Qualities (Select up to 3):</label>
+                    <div class="alq-container">
+                        <div class="alq-group">
+                            <h4 class="alq-header">Executing the Mission</h4>
+                            <div class="alq-options">
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq1" name="alq" value="Job Proficiency" class="alq-checkbox">
+                                    <label for="alq1" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Job Proficiency</span>
+                                    </label>
+                                </div>
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq2" name="alq" value="Initiative" class="alq-checkbox">
+                                    <label for="alq2" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Initiative</span>
+                                    </label>
+                                </div>
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq3" name="alq" value="Adaptability" class="alq-checkbox">
+                                    <label for="alq3" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Adaptability</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alq-group">
+                            <h4 class="alq-header">Leading People</h4>
+                            <div class="alq-options">
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq4" name="alq" value="Inclusion & Teamwork" class="alq-checkbox">
+                                    <label for="alq4" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Inclusion & Teamwork</span>
+                                    </label>
+                                </div>
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq5" name="alq" value="Emotional Intelligence" class="alq-checkbox">
+                                    <label for="alq5" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Emotional Intelligence</span>
+                                    </label>
+                                </div>
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq6" name="alq" value="Communication" class="alq-checkbox">
+                                    <label for="alq6" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Communication</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alq-group">
+                            <h4 class="alq-header">Managing Resources</h4>
+                            <div class="alq-options">
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq7" name="alq" value="Stewardship" class="alq-checkbox">
+                                    <label for="alq7" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Stewardship</span>
+                                    </label>
+                                </div>
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq8" name="alq" value="Accountability" class="alq-checkbox">
+                                    <label for="alq8" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Accountability</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alq-group">
+                            <h4 class="alq-header">Improving the Unit</h4>
+                            <div class="alq-options">
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq9" name="alq" value="Decision Making" class="alq-checkbox">
+                                    <label for="alq9" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Decision Making</span>
+                                    </label>
+                                </div>
+                                <div class="alq-option">
+                                    <input type="checkbox" id="alq10" name="alq" value="Innovation" class="alq-checkbox">
+                                    <label for="alq10" class="alq-label">
+                                        <span class="alq-checkmark"></span>
+                                        <span>Innovation</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+						<div class="card-header">
+							<span> </span>
+							<button id="toggleAlqDescriptions" class="toggle-section">ⓘ Show ALQ Descriptions</button>
+						</div>
+						
+                        <div id="alqDescriptions" class="hidden alq-desc-container">
+                            <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Airman Leadership Quality Definitions</h4>
+                            <ul style="list-style: disc; padding-left: 1.5rem; line-height: 1.8;">
+                                <li><strong>Job Proficiency:</strong> Demonstrates technical expertise and excels in performing assigned duties.</li>
+                                <li><strong>Initiative:</strong> Takes proactive action to seize opportunities without needing direction.</li>
+                                <li><strong>Adaptability:</strong> Adjusts to changing conditions and maintains performance under pressure.</li>
+                                <li><strong>Inclusion & Teamwork:</strong> Fosters collaboration and values diverse perspectives.</li>
+                                <li><strong>Emotional Intelligence:</strong> Recognizes and manages personal emotions and those of others.</li>
+                                <li><strong>Communication:</strong> Conveys ideas clearly and effectively at all organizational levels.</li>
+                                <li><strong>Stewardship:</strong> Responsibly manages time, money, equipment, and personnel.</li>
+                                <li><strong>Accountability:</strong> Takes ownership of actions and ensures tasks are completed to expectation.</li>
+                                <li><strong>Decision Making:</strong> Analyzes situations and makes sound, timely choices.</li>
+                                <li><strong>Innovation:</strong> Seeks creative solutions and implements improvements to enhance processes.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <button id="generateButton" class="btn btn-primary">Generate AI Prompt</button>
+            </div>
+        </div>
+
+        <div id="outputContainer" class="card hidden">
+            <div class="card-header">
+                <span>Generated AI Prompt</span>
+            </div>
+            <div class="card-body">
+                <div id="outputPrompt" class="output-box"></div>
+                <div class="mt-4">
+                    <button id="copyButton" class="btn btn-success">Copy Prompt</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>AI Resources</span>
+            </div>
+            <div class="card-body">
+                <p class="description-text">
+                    Paste your generated prompt in NIPRGPT or ASK SAGE.
+                </p>
+                <div class="button-group">
+                    <a href="https://niprgpt.mil/" target="_blank" rel="noopener noreferrer" class="ai-resource-link">
+                        <span class="ai-resource-icon">🤖</span>
+                        NIPRGPT
+                    </a>
+                    <a href="https://chat.asksage.mil" target="_blank" rel="noopener noreferrer" class="ai-resource-link">
+                        <span class="ai-resource-icon">💬</span>
+                        ASK SAGE
+                    </a>
+                </div>
+                <p class="description-text">
+                    Use NIPRGPT-V2 for best results.
+                </p>
+            </div>
+        </div>
+
+        <footer>
+            USAF Performance Statement AI Prompt Generator | For official use only
+        </footer>
+    </div>
+    
+    <!-- Universal Picker Modal (for Mobile) -->
+    <div id="picker-overlay" class="picker-overlay">
+        <div class="picker-modal">
+            <h3 id="picker-title" class="text-lg font-semibold text-center mb-4">Select a Value</h3>
+            <div class="picker-container">
+                <div class="picker-highlight"></div>
+                <ul id="picker-list" class="picker-list"></ul>
+            </div>
+            <div class="flex justify-end gap-4 mt-6">
+                <button id="picker-cancel-btn" class="btn btn-secondary">Cancel</button>
+                <button id="picker-confirm-btn" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
     </div>
 
-    <!-- A-Frame scene with Quest 3 passthrough support -->
-    <a-scene 
-        background="color: transparent"
-        loading-screen="enabled: false"
-        renderer="colorManagement: true; physicallyCorrectLights: true"
-        webxr="requiredFeatures: local-floor; optionalFeatures: bounded-floor, hand-tracking, hit-test; referenceSpaceType: local-floor"
-        vr-mode-ui="enabled: true">
+    <script>
+      // === Device Detection ===
+const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+
+// === Data ===
+const afscOptions = [
+   { text: '-- Select Your AFSC/Job Title --', value: '' },
+   { text: 'DOD Government Civilian', value: 'DOD Government Civilian' },
+   // Officer AFSCs
+   { text: '11S - Special Operations Pilot', value: '11S - Special Operations Pilot' },
+   { text: '12S - Special Operations Combat Systems Officer', value: '12S - Special Operations Combat Systems Officer' },
+   { text: '14F - Information Operations Officer', value: '14F - Information Operations Officer' },
+   { text: '14N - Intelligence Officer', value: '14N - Intelligence Officer' },
+   { text: '15W - Weather Officer', value: '15W - Weather Officer' },
+   { text: '17S - Cyberspace Operations Officer', value: '17S - Cyberspace Operations Officer' },
+   { text: '17D - Cyberspace Operations Officer', value: '17D - Cyberspace Operations Officer' },
+   { text: '18S - Special Reconnaissance Officer', value: '18S - Special Reconnaissance Officer' },
+   { text: '19Z - Special Warfare Officer', value: '19Z - Special Warfare Officer' },
+   { text: '21A - Aircraft Maintenance Officer', value: '21A - Aircraft Maintenance Officer' },
+   { text: '21R - Logistics Readiness Officer', value: '21R - Logistics Readiness Officer' },
+   { text: '31P - Security Forces Officer', value: '31P - Security Forces Officer' },
+   { text: '32E - Civil Engineer', value: '32E - Civil Engineer' },
+   { text: '35P - Public Affairs Officer', value: '35P - Public Affairs Officer' },
+   { text: '38F - Force Support Officer', value: '38F - Force Support Officer' },
+   { text: '41A - Health Services Administrator', value: '41A - Health Services Administrator' },
+   { text: '51J - Judge Advocate', value: '51J - Judge Advocate' },
+   { text: '52R - Chaplain', value: '52R - Chaplain' },
+   { text: '65F - Financial Management Officer', value: '65F - Financial Management Officer' },
+   { text: '87I - Contracting Officer', value: '87I - Contracting Officer' },
+   { text: '9E0 - Logistics Readiness Officer', value: '9E0 - Logistics Readiness Officer' },
+   // Enlisted AFSCs
+   { text: '1A1 - Career Enlisted Aviator', value: '1A1 - Career Enlisted Aviator' },
+   { text: '1B4 - Cyber Warfare Operations', value: '1B4 - Cyber Warfare Operations' },
+   { text: '1C0 - Aviation Resource Management', value: '1C0 - Aviation Resource Management' },
+   { text: '1C1 - Air Traffic Control', value: '1C1 - Air Traffic Control' },
+   { text: '1C3 - Command and Control Operations', value: '1C3 - Command and Control Operations' },
+   { text: '1C5 - Battle Management Operations', value: '1C5 - Battle Management Operations' },
+   { text: '1C8 - Radar, Airfield & Weather Systems', value: '1C8 - Radar, Airfield & Weather Systems' },
+   { text: '1D7 - Cyber Defense Operations', value: '1D7 - Cyber Defense Operations' },
+   { text: '1N0 - All-Source Intelligence Analyst', value: '1N0 - All-Source Intelligence Analyst' },
+   { text: '1N1 - Geospatial Intelligence', value: '1N1 - Geospatial Intelligence' },
+   { text: '1N2 - Signals Intelligence Analyst', value: '1N2 - Signals Intelligence Analyst' },
+   { text: '1N4 - Fusion Analyst', value: '1N4 - Fusion Analyst' },
+   { text: '1N7 - Human Intelligence Specialist', value: '1N7 - Human Intelligence Specialist' },
+   { text: '1P0 - Aircrew Flight Equipment', value: '1P0 - Aircrew Flight Equipment' },
+   { text: '1S0 - Safety', value: '1S0 - Safety' },
+   { text: '1T0 - Survival, Evasion, Resistance & Escape (SERE) Specialist', value: '1T0 - Survival, Evasion, Resistance & Escape (SERE) Specialist' },
+   { text: '1W0 - Weather', value: '1W0 - Weather' },
+   { text: '1Z1 - Pararescue', value: '1Z1 - Pararescue' },
+   { text: '1Z2 - Combat Control', value: '1Z2 - Combat Control' },
+   { text: '1Z3 - TACP', value: '1Z3 - TACP' },
+   { text: '1Z4 - Special Reconnaissance', value: '1Z4 - Special Reconnaissance' },
+   { text: '2A3 - Acft Mx', value: '2A3 - Acft Mx' },
+   { text: '2A5 - Aerospace Maintenance', value: '2A5 - Aerospace Maintenance' },
+   { text: '2A6 - Aircraft Systems', value: '2A6 - Aircraft Systems' },
+   { text: '2A7 - Combined Low Observable and Acft Structual Mx', value: '2A7 - Combined Low Observable and Acft Structual Mx' },
+   { text: '2A9 - Aerospace Maintenance (Non-Destructive Inspection)', value: '2A9 - Aerospace Maintenance (Non-Destructive Inspection)' },
+   { text: '2G0 - Logistics Plans', value: '2G0 - Logistics Plans' },
+   { text: '2R2 - Maintenance Management', value: '2R2 - Maintenance Management' },
+   { text: '2S0 - Materiel Management', value: '2S0 - Materiel Management' },
+   { text: '2T0 - Traffic Management Operations', value: '2T0 - Traffic Management Operations' },
+   { text: '2T1 - Ground Transportation', value: '2T1 - Ground Transportation' },
+   { text: '2T2 - Air Transportation', value: '2T2 - Air Transportation' },
+   { text: '2T3X1 - Vehicle Maintenance', value: '2T3X1 - Vehicle Maintenance' },
+   { text: '2T3X7 - Vehicle Fleet Management', value: '2T3X7 - Vehicle Fleet Management' },
+   { text: '2W0 - Munitions Systems', value: '2W0 - Munitions Systems' },
+   { text: '2W1 - Aircraft Armament Systems', value: '2W1 - Aircraft Armament Systems' },
+   { text: '3E0 - Electrical Systems', value: '3E0 - Electrical Systems' },
+   { text: '3E1 - Heating, Ventilation, AC, and Refrigeration', value: '3E1 - Heating, Ventilation, AC, and Refrigeration' },
+   { text: '3E2 - Heavy Equipment', value: '3E2 - Heavy Equipment' },
+   { text: '3E3 - Structures', value: '3E3 - Structures' },
+   { text: '3E4 - Pest Management', value: '3E4 - Pest Management' },
+   { text: '3E5 - Engineering', value: '3E5 - Engineering' },
+   { text: '3E6 - Operations Management', value: '3E6 - Operations Management' },
+   { text: '3E7 - Fire Protection', value: '3E7 - Fire Protection' },
+   { text: '3E8 - Explosive Ordnance Disposal', value: '3E8 - Explosive Ordnance Disposal' },
+   { text: '3E9 - Emergency Management', value: '3E9 - Emergency Management' },
+   { text: '3F0 - Personnel', value: '3F0 - Personnel' },
+   { text: '3F1 - Services', value: '3F1 - Services' },
+   { text: '3F2 - Education and Training', value: '3F2 - Education and Training' },
+   { text: '3F3 - Manpower', value: '3F3 - Manpower' },
+   { text: '3F4 - Equal Opportunity', value: '3F4 - Equal Opportunity' },
+   { text: '3F5 - Administration', value: '3F5 - Administration' },
+   { text: '3N0 - Public Affairs', value: '3N0 - Public Affairs' },
+   { text: '3N1 - Regional Bands', value: '3N1 - Regional Bands' },
+   { text: '3P0 - Security Forces', value: '3P0 - Security Forces' },
+   { text: '4A1 - Medical Materiel', value: '4A1 - Medical Materiel' },
+   { text: '4B0 - Bioenvironmental Engineering', value: '4B0 - Bioenvironmental Engineering' },
+   { text: '4N0 - Aerospace Medical Service', value: '4N0 - Aerospace Medical Service' },
+   { text: '4R0 - Radiology', value: '4R0 - Radiology' },
+   { text: '5J0 - Paralegal', value: '5J0 - Paralegal' },
+   { text: '5R0 - Chaplain Assistant', value: '5R0 - Chaplain Assistant' },
+   { text: '6F0 - Financial Management and Comptroller', value: '6F0 - Financial Management and Comptroller' },
+   { text: '7S - OSI Enlisted', value: '7S - OSI Enlisted' },
+   { text: '8C000 - MFR NCO', value: '8C000 - MFR NCO' },
+   { text: '8F0 - First Sergeant', value: '8F0 - First Sergeant' },
+   { text: '8H000 - Airman Dorm Leader', value: '8H000 - Airman Dorm Leader' },
+   { text: '8I0 - Inspector General', value: '8I0 - Inspector General' },
+   { text: '8R - Recruiters', value: '8R - Recruiters' },
+   { text: '8T000 - Professional Military Education Instructor', value: '8T000 - Professional Military Education Instructor' },
+   { text: 'Other (Specify Below)', value: 'other' }
+];
+
+const majcomOptions = [
+   { text: '-- Select Your MAJCOM --', value: '' },
+   { text: 'Air Combat Command (ACC)', value: 'Air Combat Command (ACC)' },
+   { text: 'Air Education and Training Command (AETC)', value: 'Air Education and Training Command (AETC)' },
+   { text: 'Air Force Global Strike Command (AFGSC)', value: 'Air Force Global Strike Command (AFGSC)' },
+   { text: 'Air Force Materiel Command (AFMC)', value: 'Air Force Materiel Command (AFMC)' },
+   { text: 'Air Force Reserve Command (AFRC)', value: 'Air Force Reserve Command (AFRC)' },
+   { text: 'Air Force Special Operations Command (AFSOC)', value: 'Air Force Special Operations Command (AFSOC)' },
+   { text: 'Air Mobility Command (AMC)', value: 'Air Mobility Command (AMC)' },
+   { text: 'Pacific Air Forces (PACAF)', value: 'Pacific Air Forces (PACAF)' },
+   { text: 'U.S. Air Forces in Europe – Air Forces Africa (USAFE-AFAFRICA)', value: 'U.S. Air Forces in Europe – Air Forces Africa (USAFE-AFAFRICA)' },
+   { text: 'Air Force Medical Command (AFMEDCOM)', value: 'Air Force Medical Command (AFMEDCOM)' },
+   { text: 'Air National Guard Readiness Center (ANGRC)', value: 'Air National Guard Readiness Center (ANGRC)' },
+   { text: 'Headquarters Air Force (HAF)', value: 'Headquarters Air Force (HAF)' },
+   { text: 'Air Force Southern Command (AFSOUTH)', value: 'Air Force Southern Command (AFSOUTH)' },
+   { text: 'U.S. Air Forces Central (AFCENT)', value: 'U.S. Air Forces Central (AFCENT)' },
+];
+
+const mgaOptions = [
+   { text: '-- Select Major Graded Area --', value: '' },
+   { text: 'Executing the Mission', value: 'Executing the Mission' },
+   { text: 'Leading People', value: 'Leading People' },
+   { text: 'Managing Resources', value: 'Managing Resources' },
+   { text: 'Improving the Unit', value: 'Improving the Unit' }
+];
+
+const purposeOptions = [
+   { text: 'Award Package (AF Form 1206)', value: 'award' },
+   { text: 'Enlisted Performance Brief (EPB)', value: 'epr' },
+   { text: 'Officer Performance Brief (OPB)', value: 'opr' },
+   { text: 'Weekly Civilian Performance', value: 'weekly' }
+];
+
+// === Picker/Dropdown Logic ===
+const pickerOverlay = document.getElementById('picker-overlay');
+const pickerList = document.getElementById('picker-list');
+const pickerTitle = document.getElementById('picker-title');
+const pickerConfirmBtn = document.getElementById('picker-confirm-btn');
+const pickerCancelBtn = document.getElementById('picker-cancel-btn');
+
+const ITEM_HEIGHT = 48;
+const FRICTION = 0.95;
+const MIN_VELOCITY = 0.1;
+
+let pickerState = {
+   targetElement: null,
+   options: [],
+   isDragging: false,
+   startY: 0,
+   startTranslate: 0,
+   currentTranslate: 0,
+   velocity: 0,
+   lastY: 0,
+   lastTime: 0,
+   animationFrame: null,
+   minTranslate: 0,
+   maxTranslate: 0,
+};
+
+function openPicker(target, options, initialValue, title) {
+    pickerState.targetElement = target;
+    pickerState.options = options;
+    pickerState.filteredOptions = options; // Add filtered options
+    pickerTitle.textContent = title;
+    
+    // Add search input if it's for AFSC
+    if (target.id === 'jobTitle') {
+        const searchContainer = document.createElement('div');
+        searchContainer.style.cssText = 'margin-bottom: 1rem;';
+        searchContainer.innerHTML = `
+            <input type="text" id="picker-search" placeholder="Type to search..." 
+                style="width: 100%; padding: 0.5rem; background: var(--input-bg); 
+                border: 1px solid var(--border-color); border-radius: 0.25rem; 
+                color: var(--text-primary);">
+        `;
+        pickerTitle.parentElement.insertBefore(searchContainer, pickerTitle.nextSibling);
         
-        <a-assets timeout="10000">
-            <!-- Placeholder texture for info panels -->
-            <img id="info-bg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='256'%3E%3Crect width='512' height='256' fill='%23000000' opacity='0.8'/%3E%3C/svg%3E" crossorigin="anonymous">
-        </a-assets>
+        // Add search listener
+        document.getElementById('picker-search').addEventListener('input', (e) => {
+            const filtered = options.filter(opt => 
+                opt.text.toLowerCase().includes(e.target.value.toLowerCase())
+            );
+            pickerState.filteredOptions = filtered;
+            renderPickerList(filtered);
+        });
+    }
+    
+    renderPickerList(options);
+    // ... rest of the function
+}
 
-        <!-- Camera rig with Quest 3 optimized settings -->
-        <a-entity id="rig" 
-                  movement-controls="speed: 0.1; fly: false"
-                  position="0 1.6 2">
-            
-            <!-- Camera with proper Quest 3 settings -->
-            <a-camera 
-                look-controls="pointerLockEnabled: false"
-                wasd-controls="enabled: false">
-                
-                <!-- Desktop cursor for testing -->
-                <a-cursor 
-                    raycaster="objects: .interactive; far: 10"
-                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                    material="color: #FF0000; shader: flat"
-                    visible="true">
-                </a-cursor>
-            </a-camera>
+function renderPickerList(options) {
+    pickerList.innerHTML = '';
+    options.forEach(option => {
+        const li = document.createElement('li');
+        li.textContent = option.text;
+        li.dataset.value = option.value;
+        pickerList.appendChild(li);
+    });
+    // Reset position to top
+    pickerState.currentTranslate = pickerState.maxTranslate;
+    pickerList.style.transform = `translateY(${pickerState.currentTranslate}px)`;
+    updateHighlight(pickerState.currentTranslate);
+}
 
-            <!-- Right hand controller -->
-            <a-entity 
-                id="right-hand"
-                hand-controls="hand: right; handModelStyle: lowPoly; color: #ffcccc"
-                raycaster="objects: .interactive; far: 10; showLine: true; lineColor: #FF0000; lineOpacity: 0.8"
-                line="color: #FF0000; opacity: 0.8; visible: true"
-                controller-interaction>
-            </a-entity>
+function closePicker() {
+   pickerOverlay.classList.remove('visible');
+   pickerState.targetElement = null;
+}
 
-            <!-- Left hand controller -->
-            <a-entity 
-                id="left-hand"
-                hand-controls="hand: left; handModelStyle: lowPoly; color: #ffcccc"
-                raycaster="objects: .interactive; far: 10; showLine: true; lineColor: #0000FF; lineOpacity: 0.8"
-                line="color: #0000FF; opacity: 0.8; visible: true"
-                controller-interaction>
-            </a-entity>
-        </a-entity>
+function confirmSelection() {
+   const selectedIndex = Math.round((pickerState.maxTranslate - pickerState.currentTranslate) / ITEM_HEIGHT);
+   const selectedOption = pickerState.options[selectedIndex];
+   
+   if (pickerState.targetElement && selectedOption) {
+       pickerState.targetElement.textContent = selectedOption.text;
+       pickerState.targetElement.dataset.value = selectedOption.value;
+       if (pickerState.targetElement.id === 'jobTitle') {
+            document.getElementById('otherJobField').classList.toggle('hidden', selectedOption.value !== 'other');
+       }
+   }
+   closePicker();
+}
 
-        <!-- Interactive boxes positioned around the user -->
-        <a-box 
-            id="box-1"
-            position="-2 1.6 -2"
-            width="0.5" height="0.5" depth="0.5"
-            color="#FF5733"
-            class="interactive"
-            box-info="title: Red Box; description: This is the red information box. Click to interact with VR elements.">
-        </a-box>
+function handleDragStart(y) {
+   cancelAnimationFrame(pickerState.animationFrame);
+   pickerState.isDragging = true;
+   pickerState.startY = y;
+   pickerState.startTranslate = pickerState.currentTranslate;
+   pickerState.velocity = 0;
+   pickerState.lastY = y;
+   pickerState.lastTime = performance.now();
+}
 
-        <a-box 
-            id="box-2"
-            position="2 1.6 -2"
-            width="0.5" height="0.5" depth="0.5"
-            color="#33FF57"
-            class="interactive"
-            box-info="title: Green Box; description: This green box demonstrates Quest 3 passthrough interaction capabilities.">
-        </a-box>
+function handleDragMove(y) {
+   if (!pickerState.isDragging) return;
+   const deltaY = y - pickerState.startY;
+   pickerState.currentTranslate = pickerState.startTranslate + deltaY;
+   pickerList.style.transform = `translateY(${pickerState.currentTranslate}px)`;
+   const now = performance.now();
+   const elapsed = now - pickerState.lastTime;
+   if (elapsed > 0) {
+       const currentVelocity = (y - pickerState.lastY) / elapsed;
+       pickerState.velocity = pickerState.velocity * 0.8 + currentVelocity * 0.2;
+   }
+   pickerState.lastY = y;
+   pickerState.lastTime = now;
+   updateHighlight(pickerState.currentTranslate);
+}
 
-        <a-box 
-            id="box-3"
-            position="-2 1.6 0"
-            width="0.5" height="0.5" depth="0.5"
-            color="#3357FF"
-            class="interactive"
-            box-info="title: Blue Box; description: Hand tracking and controller input work seamlessly in mixed reality.">
-        </a-box>
+function handleDragEnd() {
+   if (!pickerState.isDragging) return;
+   pickerState.isDragging = false;
+   startInertia();
+}
 
-        <a-box 
-            id="box-4"
-            position="2 1.6 0"
-            width="0.5" height="0.5" depth="0.5"
-            color="#FF33FF"
-            class="interactive"
-            box-info="title: Purple Box; description: Experience the future of mixed reality with Quest 3 passthrough.">
-        </a-box>
+function startInertia() {
+   cancelAnimationFrame(pickerState.animationFrame);
+   const tick = () => {
+       pickerState.currentTranslate += pickerState.velocity * 16;
+       pickerState.velocity *= FRICTION;
+       if (pickerState.currentTranslate > pickerState.maxTranslate) {
+           pickerState.currentTranslate = pickerState.maxTranslate;
+           pickerState.velocity = 0;
+       }
+       if (pickerState.currentTranslate < pickerState.minTranslate) {
+           pickerState.currentTranslate = pickerState.minTranslate;
+           pickerState.velocity = 0;
+       }
+       pickerList.style.transform = `translateY(${pickerState.currentTranslate}px)`;
+       updateHighlight(pickerState.currentTranslate);
+       if (Math.abs(pickerState.velocity) > MIN_VELOCITY) {
+           pickerState.animationFrame = requestAnimationFrame(tick);
+       } else {
+           snapToNearest();
+       }
+   };
+   pickerState.animationFrame = requestAnimationFrame(tick);
+}
 
-        <!-- Info panel template (initially hidden) -->
-        <a-entity 
-            id="info-panel"
-            position="0 2.5 -1"
-            visible="false"
-            geometry="primitive: plane; width: 2; height: 1"
-            material="src: #info-bg; transparent: true; opacity: 0.9"
-            text="value: Default Info; align: center; width: 4; wrapCount: 30; color: white; font: dejavu">
-            
-            <!-- Close button -->
-            <a-box 
-                id="close-button"
-                position="0.9 0.4 0.01"
-                width="0.15" height="0.15" depth="0.02"
-                color="#FF4444"
-                class="interactive"
-                geometry="primitive: box"
-                text="value: X; align: center; width: 8; color: white; font: dejavu">
-            </a-box>
-        </a-entity>
+function snapToNearest() {
+   const selectedIndex = Math.round((pickerState.maxTranslate - pickerState.currentTranslate) / ITEM_HEIGHT);
+   const targetTranslate = pickerState.maxTranslate - selectedIndex * ITEM_HEIGHT;
+   pickerList.style.transition = 'transform 0.2s ease-out';
+   pickerList.style.transform = `translateY(${targetTranslate}px)`;
+   pickerState.currentTranslate = targetTranslate;
+   updateHighlight(targetTranslate);
+   setTimeout(() => { pickerList.style.transition = ''; }, 200);
+}
 
-        <!-- Lighting optimized for mixed reality -->
-        <a-entity light="type: ambient; color: #FFFFFF; intensity: 0.6"></a-entity>
-        <a-entity light="type: directional; color: #FFFFFF; intensity: 0.8; castShadow: true" position="2 4 2"></a-entity>
+function updateHighlight(currentTranslate) {
+   const centerOffset = pickerState.maxTranslate;
+   pickerList.querySelectorAll('li').forEach((li, index) => {
+       const liTranslate = centerOffset - index * ITEM_HEIGHT;
+       const distance = Math.abs(currentTranslate - liTranslate);
+       li.style.color = distance < ITEM_HEIGHT / 2 ? 'var(--text-primary)' : 'var(--text-secondary)';
+       li.style.fontWeight = distance < ITEM_HEIGHT / 2 ? '600' : '400';
+   });
+}
 
-        <!-- Custom components and interaction logic -->
-        <script>
-            // Wait for A-Frame to load before registering components
-            if (typeof AFRAME !== 'undefined') {
-                registerComponents();
-            } else {
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Wait a bit more for A-Frame to fully initialize
-                    setTimeout(registerComponents, 100);
-                });
+function createCustomDropdown(options, initialValue, id) {
+   const initialOption = options.find(opt => opt.value === initialValue) || options[0];
+   return `
+       <div id="${id}" class="custom-dropdown" data-value="${initialOption.value}">
+           <div class="custom-dropdown-selected">
+               <span>${initialOption.text}</span>
+           </div>
+       </div>
+   `;
+}
+
+function initDesktopDropdown(dropdown, options) {
+   const selected = dropdown.querySelector('.custom-dropdown-selected');
+   selected.addEventListener('click', (e) => {
+       e.stopPropagation();
+       closeAllDropdowns();
+       createFloatingDropdown(dropdown, options);
+   });
+}
+
+function createFloatingDropdown(parentDropdown, options) {
+    closeAllDropdowns();
+    const panel = document.createElement('div');
+    panel.id = 'floating-dropdown-panel';
+    panel.className = 'floating-dropdown-options';
+    
+    // Add search input at the top
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Type to search...';
+    searchInput.className = 'dropdown-search-input';
+    searchInput.style.cssText = `
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: none;
+        border-bottom: 1px solid var(--border-color);
+        background: transparent;
+        color: var(--text-primary);
+        outline: none;
+    `;
+    panel.appendChild(searchInput);
+    
+    // Create options container
+    const optionsContainer = document.createElement('div');
+    optionsContainer.className = 'dropdown-options-container';
+    
+    // Function to render filtered options
+    function renderOptions(filterText = '') {
+        optionsContainer.innerHTML = '';
+        const filtered = options.filter(opt => 
+            opt.text.toLowerCase().includes(filterText.toLowerCase())
+        );
+        
+        filtered.forEach(opt => {
+            const optionEl = document.createElement('div');
+            optionEl.className = 'floating-dropdown-option';
+            optionEl.textContent = opt.text;
+            optionEl.dataset.value = opt.value;
+            if (parentDropdown.dataset.value === opt.value) {
+                optionEl.classList.add('selected');
             }
-
-            function registerComponents() {
-                // Custom component for box information
-                AFRAME.registerComponent('box-info', {
-                    schema: {
-                        title: { type: 'string', default: 'Info' },
-                        description: { type: 'string', default: 'No description available.' }
-                    },
-                    
-                    init: function () {
-                        const el = this.el;
-                        const data = this.data;
-                        
-                        // Add hover effects
-                        el.addEventListener('mouseenter', function () {
-                            el.setAttribute('scale', '1.1 1.1 1.1');
-                            el.setAttribute('animation', 'property: rotation; to: 0 360 0; dur: 2000; loop: true');
-                        });
-                        
-                        el.addEventListener('mouseleave', function () {
-                            el.setAttribute('scale', '1 1 1');
-                            el.removeAttribute('animation');
-                        });
-                        
-                        // Click handler
-                        el.addEventListener('click', function (evt) {
-                            const infoPanel = document.getElementById('info-panel');
-                            const infoText = infoPanel.querySelector('a-text');
-                            
-                            // Update info panel content
-                            const fullText = `${data.title}\n\n${data.description}`;
-                            infoText.setAttribute('value', fullText);
-                            
-                            // Position info panel above the clicked box
-                            const boxPosition = el.getAttribute('position');
-                            infoPanel.setAttribute('position', {
-                                x: boxPosition.x,
-                                y: boxPosition.y + 1,
-                                z: boxPosition.z
-                            });
-                            
-                            // Show the panel
-                            infoPanel.setAttribute('visible', true);
-                            
-                            // Make panel face the camera
-                            const camera = document.querySelector('a-camera');
-                            infoPanel.object3D.lookAt(camera.object3D.position);
-                            
-                            console.log(`Clicked on ${data.title}`);
-                        });
-                    }
-                });
-
-                // Controller interaction component
-                AFRAME.registerComponent('controller-interaction', {
-                    init: function () {
-                        const el = this.el;
-                        
-                        // Handle controller trigger/select events
-                        el.addEventListener('triggerdown', function (evt) {
-                            const intersectedEl = evt.detail.intersectedEl;
-                            if (intersectedEl && intersectedEl.classList.contains('interactive')) {
-                                intersectedEl.click();
-                            }
-                        });
-                        
-                        // Handle controller grip events
-                        el.addEventListener('gripdown', function (evt) {
-                            console.log('Grip pressed on controller');
-                        });
-                    }
-                });
-            }
-
-            // Initialize the application
-            document.addEventListener('DOMContentLoaded', function () {
-                const loadingScreen = document.getElementById('loading-screen');
-                const enterVRButton = document.getElementById('enter-vr-button');
-                const scene = document.querySelector('a-scene');
-                const infoPanel = document.getElementById('info-panel');
-                const closeButton = document.getElementById('close-button');
-
-                // Enter VR button handler
-                enterVRButton.addEventListener('click', function () {
-                    loadingScreen.style.display = 'none';
-                    
-                    // Check if VR is available
-                    if (navigator.xr) {
-                        navigator.xr.isSessionSupported('immersive-vr').then(function (supported) {
-                            if (supported) {
-                                console.log('VR supported - Ready for Quest 3!');
-                            } else {
-                                console.log('VR not supported on this device');
-                            }
-                        });
-                    }
-                });
-
-                // Close button handler
-                closeButton.addEventListener('click', function () {
-                    infoPanel.setAttribute('visible', false);
-                });
-
-                // Scene loaded handler
-                scene.addEventListener('loaded', function () {
-                    console.log('A-Frame scene loaded and ready!');
-                    
-                    // Check for WebXR support
-                    if ('xr' in navigator) {
-                        console.log('WebXR is supported');
-                    } else {
-                        console.log('WebXR is not supported');
-                    }
-                });
-
-                // Handle VR mode changes
-                scene.addEventListener('enter-vr', function () {
-                    console.log('Entered VR mode');
-                    // Hide desktop cursor in VR
-                    document.querySelector('a-cursor').setAttribute('visible', false);
-                });
-
-                scene.addEventListener('exit-vr', function () {
-                    console.log('Exited VR mode');
-                    // Show desktop cursor when not in VR
-                    document.querySelector('a-cursor').setAttribute('visible', true);
-                });
-
-                // Error handling
-                scene.addEventListener('error', function (error) {
-                    console.error('A-Frame error:', error);
-                });
+            optionEl.addEventListener('click', () => {
+                parentDropdown.dataset.value = opt.value;
+                parentDropdown.querySelector('span').textContent = opt.text;
+                closeAllDropdowns();
+                if (parentDropdown.id === 'jobTitle') {
+                    document.getElementById('otherJobField').classList.toggle('hidden', opt.value !== 'other');
+                }
             });
-        </script>
-    </a-scene>
+            optionsContainer.appendChild(optionEl);
+        });
+    }
+    
+    // Initial render
+    renderOptions();
+    panel.appendChild(optionsContainer);
+    
+    // Add search functionality
+    searchInput.addEventListener('input', (e) => {
+        renderOptions(e.target.value);
+    });
+    
+    // Focus search input when opened
+    setTimeout(() => searchInput.focus(), 0);
+    
+    // Prevent closing when clicking search input
+    searchInput.addEventListener('click', (e) => e.stopPropagation());
+    
+    document.body.appendChild(panel);
+    const rect = parentDropdown.getBoundingClientRect();
+    panel.style.left = `${rect.left}px`;
+    panel.style.top = `${rect.bottom + 4}px`;
+    panel.style.width = `${rect.width}px`;
+}
+
+function closeAllDropdowns() {
+   const existingPanel = document.getElementById('floating-dropdown-panel');
+   if (existingPanel) existingPanel.remove();
+}
+
+function createResponsiveSelect(containerId, options, initialValue) {
+   const container = document.getElementById(containerId);
+   if (isTouchDevice) {
+       const initialOption = options.find(opt => opt.value === initialValue) || options[0];
+       const pickerInput = document.createElement('div');
+       pickerInput.id = containerId.replace('Container', '');
+       pickerInput.className = 'custom-picker-input';
+       pickerInput.textContent = initialOption.text;
+       pickerInput.dataset.value = initialOption.value;
+       pickerInput.addEventListener('click', (e) => {
+           openPicker(e.target, options, e.target.dataset.value, `Select ${containerId.replace('Container', '')}`);
+       });
+       container.innerHTML = '';
+       container.appendChild(pickerInput);
+   } else {
+       container.innerHTML = createCustomDropdown(options, initialValue, containerId.replace('Container', ''));
+       initDesktopDropdown(container.querySelector('.custom-dropdown'), options);
+   }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+   // Initialize all dropdowns
+   createResponsiveSelect('jobTitleContainer', afscOptions, '');
+   createResponsiveSelect('majcomContainer', majcomOptions, '');
+   createResponsiveSelect('mgaContainer', mgaOptions, '');
+   createResponsiveSelect('purposeContainer', purposeOptions, 'award');
+
+   // Toggle "How to Use This Tool" section
+   document.getElementById('howToUseToggle').addEventListener('click', function() {
+       const howToUseBody = document.getElementById('howToUseBody');
+       howToUseBody.classList.toggle('hidden');
+       this.textContent = howToUseBody.classList.contains('hidden') ? 'ⓘ Show Instructions' : '✕ Hide Instructions';
+   });
+
+   // Toggle reference section
+   document.getElementById('toggleReference').addEventListener('click', function() {
+       const referenceSection = document.getElementById('referenceSection');
+       referenceSection.classList.toggle('hidden');
+       this.textContent = referenceSection.classList.contains('hidden') ? 'ⓘ Show Guidance' : '✕ Hide Guidance';
+   });
+
+   // Toggle ALQ descriptions
+   document.getElementById('toggleAlqDescriptions').addEventListener('click', function() {
+       const alqDescriptions = document.getElementById('alqDescriptions');
+       alqDescriptions.classList.toggle('hidden');
+       this.textContent = alqDescriptions.classList.contains('hidden') ? 'Show ALQ Descriptions' : 'Hide ALQ Descriptions';
+   });
+
+   // ALQ checkbox handling with max 3 selections
+   let selectedAlqsOrder = [];
+   document.querySelectorAll('.alq-checkbox').forEach(checkbox => {
+       checkbox.addEventListener('change', function() {
+           const id = this.id;
+           // Remove from array if it exists
+           selectedAlqsOrder = selectedAlqsOrder.filter(item => item !== id);
+           
+           if (this.checked) {
+               // Add to the end of the array
+               selectedAlqsOrder.push(id);
+               if (selectedAlqsOrder.length > 3) {
+                   const oldestId = selectedAlqsOrder.shift(); // Remove the oldest
+                   document.getElementById(oldestId).checked = false;
+               }
+           }
+       });
+   });
+
+   document.getElementById('copyButton').addEventListener('click', function() {
+       const promptText = document.getElementById('outputPrompt').textContent;
+       navigator.clipboard.writeText(promptText).then(() => {
+           this.textContent = 'Copied!';
+           setTimeout(() => { this.textContent = 'Copy Prompt'; }, 2000);
+       });
+   });
+
+   document.getElementById('generateButton').addEventListener('click', function() {
+       let jobTitleEl = document.getElementById('jobTitle');
+       let jobTitle = jobTitleEl.dataset.value;
+
+       if (jobTitle === 'other') {
+           jobTitle = document.getElementById('otherJobTitle').value || 'Unspecified Job Title';
+       }
+
+       const selectedMajcom = document.getElementById('majcom').dataset.value;
+       const selectedMGA = document.getElementById('mga').dataset.value;
+       const accomplishment = document.getElementById('accomplishment').value || '';
+       const purpose = document.getElementById('purpose').dataset.value;
+
+       if (!jobTitle || !selectedMajcom || !selectedMGA || !accomplishment) {
+           alert('Please fill in all required fields: Job Title, MAJCOM, Major Graded Area, and Accomplishment.');
+           return;
+       }
+
+       const selectedAlqs = Array.from(document.querySelectorAll('input[name="alq"]:checked')).map(cb => cb.value);
+       
+       let alqSection = selectedAlqs.length > 0 ? 'Airman Leadership Qualities (ALQs) to highlight:\n' + selectedAlqs.join(', ') + '\n\n' : '';
+
+       const commonInstructions = `You are a USAF writing assistant specializing in crafting effective performance statements.
+
+Job Title/AFSC: ${jobTitle}
+MAJCOM: ${selectedMajcom}
+Major Graded Area (MGA): ${selectedMGA}
+
+My accomplishment:
+${accomplishment}
+
+${alqSection}Please convert this into 5-7 proper USAF Performance Statements following these guidelines:
+- Each statement is a standalone sentence.
+- Include an action and at least one impact or result.
+- The impact must relate to the MAJCOM's mission and the selected MGA.
+- Use plain language and avoid uncommon acronyms.
+- Emphasize leadership, mission impact, and quantifiable results.`;
+
+       let charLimit = 250;
+       let prompt = '';
+       
+       switch(purpose) {
+           case 'weekly':
+               prompt = `${commonInstructions}
+
+Please create 5-7 performance statements suitable for a Weekly Civilian Performance report that highlights my most significant contributions this week. Focus on mission impact and demonstrate impact appropriate for the employee's position.
+
+IMPORTANT: Each statement MUST be EXACTLY 250 characters long (including spaces and punctuation). Provide only the formatted statements.`;
+               break;
+
+           case 'award':
+               prompt = `${commonInstructions}
+
+Please create 5-7 performance statements suitable for an AF Form 1206 Award Package. Statements should be impactful, showcase leadership, and emphasize quantifiable results.
+
+IMPORTANT: Each statement MUST be EXACTLY 250 characters long (including spaces and punctuation). Provide only the formatted statements.`;
+               break;
+
+           case 'epr':
+               charLimit = 175;
+               prompt = `${commonInstructions}
+
+Please create 5-7 performance statements suitable for an Enlisted Performance Brief (EPB). Focus on duty performance, leadership/followership, and whole airman concept.
+
+IMPORTANT: Each statement MUST be EXACTLY 175 characters long (including spaces and punctuation). Provide only the formatted statements.`;
+               break;
+
+           case 'opr':
+               charLimit = 175;
+               prompt = `${commonInstructions}
+
+Please create 5-7 performance statements suitable for an Officer Performance Brief (OPB). Focus on leadership, mission accomplishment, and professional qualities.
+
+IMPORTANT: Each statement MUST be EXACTLY 175 characters long (including spaces and punctuation). Provide only the formatted statements.`;
+               break;
+       }
+
+       document.getElementById('outputPrompt').textContent = prompt;
+       document.getElementById('outputContainer').classList.remove('hidden');
+       document.getElementById('outputContainer').scrollIntoView({behavior: 'smooth'});
+   });
+
+   if (isTouchDevice) {
+       pickerConfirmBtn.addEventListener('click', confirmSelection);
+       pickerCancelBtn.addEventListener('click', closePicker);
+       pickerOverlay.addEventListener('click', (e) => { if (e.target === pickerOverlay) closePicker(); });
+       pickerList.addEventListener('touchstart', (e) => handleDragStart(e.touches[0].clientY));
+       pickerList.addEventListener('touchmove', (e) => handleDragMove(e.touches[0].clientY));
+       pickerList.addEventListener('touchend', handleDragEnd);
+   } else {
+       window.addEventListener('click', () => closeAllDropdowns());
+   }
+});
+    </script>
 </body>
-</html>
+</html> 
