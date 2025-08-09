@@ -709,20 +709,19 @@
         </footer>
     </div>
     
-    <!-- Universal Picker Modal (for Mobile) -->
-    <div id="picker-overlay" class="picker-overlay">
-        <div class="picker-modal">
-            <h3 id="picker-title" class="text-lg font-semibold text-center mb-4">Select a Value</h3>
-            <div class="picker-container">
-                <div class="picker-highlight"></div>
-                <ul id="picker-list" class="picker-list"></ul>
-            </div>
-            <div class="flex justify-end gap-4 mt-6">
-                <button id="picker-cancel-btn" class="btn btn-secondary">Cancel</button>
-                <button id="picker-confirm-btn" class="btn btn-primary">Confirm</button>
-            </div>
+   <div id="picker-overlay" class="picker-overlay">
+    <div class="picker-modal">
+        <h3 id="picker-title" class="text-lg font-semibold text-center mb-4">Select a Value</h3>
+        <div class="picker-container">
+            <div class="picker-highlight"></div>
+            <ul id="picker-list" class="picker-list"></ul>
+        </div>
+        <div class="flex justify-end gap-4 mt-6">
+            <button id="picker-cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button id="picker-confirm-btn" class="btn btn-primary">Confirm</button>
         </div>
     </div>
+</div>
 
     <script>
       // === Device Detection ===
@@ -1153,6 +1152,11 @@ document.addEventListener('DOMContentLoaded', function() {
    createResponsiveSelect('majcomContainer', majcomOptions, '');
    createResponsiveSelect('mgaContainer', mgaOptions, '');
    createResponsiveSelect('purposeContainer', purposeOptions, 'award');
+	const pickerOverlay = document.getElementById('picker-overlay');
+    const pickerList = document.getElementById('picker-list');
+    const pickerTitle = document.getElementById('picker-title');
+    const pickerConfirmBtn = document.getElementById('picker-confirm-btn');
+    const pickerCancelBtn = document.getElementById('picker-cancel-btn');
 
    // Toggle "How to Use This Tool" section
    document.getElementById('howToUseToggle').addEventListener('click', function() {
