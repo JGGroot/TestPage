@@ -448,6 +448,23 @@
         .picker-option-item:hover {
             background-color: rgba(168, 85, 247, 0.1);
         }
+        /* --- Visitor Counter Styles --- */
+        .visitor-counter {
+             position: fixed;
+               bottom: 1rem;
+              right: 1rem;
+              background-color: var(--card-bg); /* Uses your existing theme variable */
+             color: var(--text-secondary); /* Uses your existing theme variable */
+             padding: 0.5rem 1rem;
+              border-radius: 0.5rem;
+              border: 1px solid var(--border-color); /* Uses your existing theme variable */
+              font-size: 0.875rem;
+             backdrop-filter: blur(10px);
+             z-index: 40;
+             display: flex;
+              align-items: center;
+             gap: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -1158,6 +1175,28 @@ ${alqSection}Please convert this into 5-7 proper USAF Performance Statements fol
             }
         });
       });
+      // --- Visitor Counter Logic ---
+            const visitorCountElement = document.getElementById('visitor-count');
+            // This is a simple simulation. For a real site, you'd fetch this from a server.
+            let count = 1234; 
+            const siteVisitKey = 'siteVisited_epbTool'; // Change this key for each site for a unique counter
+
+            if (!localStorage.getItem(siteVisitKey)) {
+              count++;
+             localStorage.setItem(siteVisitKey, 'true');
+            }
+
+            visitorCountElement.textContent = count.toLocaleString();
+
     </script>
+    <div class="visitor-counter">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2 1H6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2z"/>
+        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>
+    </svg>
+    <span id="visitor-count">1,234</span>
+    <span>Visitors</span>
+</div>
+
 </body>
 </html>
