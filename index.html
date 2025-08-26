@@ -3,1200 +3,362 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USAF AI Prompt Generator</title>
-    <!-- Tailwind CSS for layout -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for typography -->
+    <title>Royal Spark AI Tesseract</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;600&display=swap" rel="stylesheet">
     <style>
-        /* --- Custom Styles for a Sleek, Modern Refresh --- */
-        :root {
-            --bg-dark: #09090b;
-            --card-bg: rgba(39, 39, 42, 0.5);
-            --border-color: rgba(161, 161, 170, 0.2);
-            --text-primary: #e4e4e7;
-            --text-secondary: #a1a1aa;
-            --primary-purple: #a855f7;
-            --primary-cyan: #22d3ee;
-            --accent-purple-muted: #c084fc;
-            --input-bg: rgba(24, 24, 27, 0.7);
-            --success-color: #2ecc71;
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(ellipse at top, rgba(168, 85, 247, 0.1), transparent 60%);
-            color: var(--text-primary);
-        }
-
-        /* --- Sticky Header --- */
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            width: 100%;
-            border-bottom: 1px solid var(--border-color);
-            background-color: rgba(9, 9, 11, 0.8);
-            backdrop-filter: blur(8px);
-            padding: 0 1rem;
-        }
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            height: 4rem;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .logo {
-            height: 2.5rem;
-            width: auto;
-        }
-        .logo-text {
-            font-size: 1.25rem;
-            font-weight: 700;
-            background: linear-gradient(to right, var(--primary-purple), var(--primary-cyan));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* Gradient Header Text for the main title */
-        h1.main-title {
-            background: linear-gradient(to right, var(--text-primary), var(--accent-purple-muted));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* --- Card Styles --- */
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            border-radius: 1rem;
-            margin-bottom: 2rem;
-        }
-        .card-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 1.125rem;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        /* --- Form & Input Styles --- */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-        input[type="text"], textarea {
-            width: 100%;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            transition: all 0.2s ease;
-        }
-        input[type="text"]:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-purple);
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
-        }
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        .custom-picker-input, .custom-dropdown-selected {
-             background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .custom-picker-input:hover, .custom-dropdown-selected:hover {
-            border-color: var(--primary-purple);
-        }
-        
-        .custom-picker-input::after, .custom-dropdown-selected::after {
-            content: '▼';
-            font-size: 0.6rem;
-            color: var(--text-secondary);
-        }
-        .floating-dropdown-options {
-            position: absolute;
-            background-color: #18181b;
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .floating-dropdown-option {
-            padding: 0.5rem 0.75rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .floating-dropdown-option:hover {
-            background-color: rgba(168, 85, 247, 0.1);
-        }
-        .floating-dropdown-option.selected {
-            background-color: rgba(168, 85, 247, 0.2);
-            font-weight: 600;
-        }
-
-        /* --- Button Styles --- */
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .btn-primary {
-            background: linear-gradient(to right, var(--primary-purple), var(--primary-cyan));
-            color: white;
-        }
-        .btn-primary:hover {
-            opacity: 0.9;
-        }
-        .btn-success {
-             background-color: var(--success-color);
-             color: white;
-        }
-        .btn-success:hover {
-            opacity: 0.9;
-        }
-
-        /* --- ALQ Checkbox Styles --- */
-        .alq-container {
-            border: 1px solid var(--border-color);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-        }
-        .alq-group {
-            margin-bottom: 1.5rem;
-        }
-        .alq-header {
-            color: var(--text-primary);
-            margin-top: 0;
-            margin-bottom: 1rem;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .alq-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        .alq-option {
-            position: relative;
-        }
-        .alq-checkbox {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-        }
-        .alq-label {
-            display: flex;
-            align-items: center;
-            background-color: var(--input-bg);
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-        }
-        .alq-option input[type="checkbox"]:checked ~ .alq-label {
-            border-color: var(--primary-purple);
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
-        }
-        .alq-checkmark {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            background-color: transparent;
-            border: 2px solid var(--text-secondary);
-            border-radius: 4px;
-            margin-right: 10px;
-            position: relative;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .alq-option input[type="checkbox"]:checked ~ .alq-label .alq-checkmark {
-            background-color: var(--primary-purple);
-            border-color: var(--primary-purple);
-        }
-        .alq-option input[type="checkbox"]:checked ~ .alq-label .alq-checkmark::after {
-            content: '';
-            position: absolute;
-            display: block;
-            top: 2px;
-            left: 5px;
-            width: 4px;
-            height: 8px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-        }
-
-        /* --- Other Styles --- */
-        .toggle-section {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            opacity: 0.7;
-        }
-        .toggle-section:hover {
-            opacity: 1;
-            background-color: rgba(168, 85, 247, 0.1);
-        }
-        .reference-section {
-            background-color: rgba(168, 85, 247, 0.05);
-            border-left: 4px solid var(--primary-purple);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-radius: 0 0.5rem 0.5rem 0;
-        }
-        .example-box {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background-color: var(--input-bg);
-            border-left: 3px solid var(--primary-cyan);
-            border-radius: 0 0.5rem 0.5rem 0;
-        }
-        .alq-desc-btn {
-            background: none;
-            border: none;
-            color: var(--primary-purple);
-            cursor: pointer;
-            font-size: 0.9rem;
-            text-decoration: underline;
-            padding: 0;
-            margin-top: 1rem;
-            transition: color 0.2s;
-            display: inline-block;
-        }
-        .alq-desc-btn:hover {
-            color: var(--primary-cyan);
-        }
-        .alq-desc-container {
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: rgba(168, 85, 247, 0.05);
-            border-radius: 0.5rem;
-            border: 1px solid var(--border-color);
-        }
-        .ai-resource-link {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(to right, var(--primary-purple), var(--primary-cyan));
-            color: white;
-            text-decoration: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: all 0.2s;
-            margin: 0 0.5rem;
-            min-width: 150px;
-        }
-        .ai-resource-link:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        .ai-resource-icon {
-            margin-right: 0.5rem;
-            font-size: 1.2em;
-        }
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        .description-text {
-            text-align: center;
-            margin: 1rem 0;
-            color: var(--text-secondary);
-        }
-        .output-box {
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            white-space: pre-wrap;
-            font-family: 'Menlo', 'Monaco', monospace;
-            font-size: 0.9rem;
-            max-height: 400px;
-            overflow-y: auto;
-            color: var(--text-primary);
-        }
-        .hidden { display: none; }
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 2rem;
-            border-top: 1px solid var(--border-color);
-        }
-        
-        /* --- Picker Modal Styles (Mobile) --- */
-        .picker-overlay {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-            padding: 1rem;
-        }
-        .picker-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-        .picker-modal {
-            background-color: #18181b;
-            border-radius: 1rem;
-            width: 100%;
-            max-width: 28rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            transform: scale(0.95);
-            transition: transform 0.3s;
-            display: flex;
-            flex-direction: column;
-            max-height: 90vh;
-        }
-        .picker-overlay.visible .picker-modal {
-            transform: scale(1);
-        }
-        .picker-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        #picker-search-input {
-            width: 100%;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 0.5rem;
-            padding: 0.5rem 1rem;
-        }
-        #picker-search-input:focus {
-            outline: none;
-            border-color: var(--primary-purple);
-        }
-        .picker-options-list {
-            list-style: none;
-            padding: 0.5rem;
             margin: 0;
-            overflow-y: auto;
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, #1e0a33 0%, #000000 100%);
+            color: #fff;
+            font-family: 'Exo 2', sans-serif;
         }
-        .picker-option-item {
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
+        canvas {
+            display: block;
         }
-        .picker-option-item:hover {
-            background-color: rgba(168, 85, 247, 0.1);
+        #title-container {
+            position: absolute;
+            top: 30px;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
         }
-        /* --- Visitor Counter Styles --- */
-        .visitor-counter {
-             position: fixed;
-               bottom: 1rem;
-              right: 1rem;
-              background-color: var(--card-bg); /* Uses your existing theme variable */
-             color: var(--text-secondary); /* Uses your existing theme variable */
-             padding: 0.5rem 1rem;
-              border-radius: 0.5rem;
-              border: 1px solid var(--border-color); /* Uses your existing theme variable */
-              font-size: 0.875rem;
-             backdrop-filter: blur(10px);
-             z-index: 40;
-             display: flex;
-              align-items: center;
-             gap: 0.5rem;
+        h1 {
+            margin: 0;
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #a855f7, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+            animation: pulse-glow 4s infinite alternate;
+        }
+        .link-container {
+            position: absolute;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            perspective: 1000px;
+        }
+        .tool-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 160px;
+            height: 160px;
+            padding: 10px;
+            text-align: center;
+            background: rgba(17, 24, 39, 0.6);
+            border: 1px solid rgba(139, 92, 246, 0.5);
+            border-radius: 50%; /* This makes it a circle */
+            text-decoration: none;
+            color: #f9fafb;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            white-space: normal; /* Allow text to wrap */
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2), inset 0 0 10px rgba(139, 92, 246, 0.3);
+        }
+        .tool-link:hover {
+            transform: scale(1.1);
+            background: rgba(139, 92, 246, 0.4);
+            border-color: #a855f7;
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+            text-shadow: 0 0 10px #fff;
+        }
+        
+        @keyframes pulse-glow {
+            from { text-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
+            to { text-shadow: 0 0 35px rgba(96, 165, 250, 0.6); }
         }
     </style>
 </head>
 <body>
-    <!-- Sticky Header -->
-    <header class="header">
-        <div class="header-container">
-            <a href="https://royal-spark.github.io/Landing-Page/" style="text-decoration: none;">
-				<div class="logo-container">
-					<img src="https://dwtymuzolmglgyejxuve.supabase.co/storage/v1/object/public/podcasts//Royal%20Spark%20D%20Logo%20-%20Mekvold%20V3.png" alt="Royal Spark Logo" style="height: 2.5rem; width: auto;">
-					<span style="font-size: 1.25rem; font-weight: 700; background: linear-gradient(to right, var(--primary-purple), var(--primary-cyan)); -webkit-background-clip: text; background-clip: text; color: transparent; margin-left: 0.5rem;">Royal Spark</span>
-				</div>
-			</a>
-        </div>
-    </header>
-
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 pb-6 pt-8">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold main-title">USAF AI Prompt Generator</h1>
-            <p class="text-sm text-slate-400 mt-1">Turn accomplishments into powerful performance statements.</p>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <span>How to Use This Tool</span>
-                <button id="howToUseToggle" class="toggle-section">ⓘ Show Instructions</button>
-            </div>
-            <div id="howToUseBody" class="card-body hidden">
-                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Purpose: Get 80% of your performance statements done in minutes!</h2>
-                <p style="margin-bottom: 1rem;">Our AI tool empowers every Airman to rapidly turn their accomplishments into strong, AFI-structured performance statements. This saves time for both Airmen and supervisors, leading to faster, higher-quality 1206s.</p>
-                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Step-by-Step Guide:</h2>
-                <ol style="list-style: decimal; padding-left: 1.5rem; line-height: 1.8;">
-                    <li><strong>Step 1:</strong> Input Your Accomplishments: Simply type in all your details and "word vomit" your achievements.</li>
-                    <li><strong>Step 2:</strong> Generate Prompt: Click the "generate prompt" button to create your AI-ready text.</li>
-                    <li><strong>Step 3:</strong> Paste & Generate: Copy the prompt and paste it into NIPRGPT or ASK SAGE to get 7 drafted performance statements.</li>
-                    <li><strong>Step 4:</strong> Select & Refine: Review the 7 AI-generated statements and select the best parts to provide to your supervisor.</li>
-                    <li><strong>Step 5:</strong> Supervisor Review: Your supervisor refines the chosen statements for final perfection.</li>
-                </ol>
-                <p style="text-align: center; margin-top: 1.5rem;">That's it! Get high-quality, AFI-structured performance statements in minutes.</p>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <span>Input Information</span>
-                <button id="toggleReference" class="toggle-section">ⓘ Show Guidance</button>
-            </div>
-            <div id="referenceSection" class="reference-section hidden">
-                <h3 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Official USAF Performance Statement Guidance:</h3>
-                <p style="margin-bottom: 1rem;">Performance Statements are the AF narrative-style of writing to communicate performance on the AF Form 1206, Nomination for Award (13 Mar 2024). They are efficient, increase clarity, and improve the ability to understand an Airman's performance correctly and equitably.</p>
-                
-                <h4 style="font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">Two Basic Principles:</h4>
-                <ul style="list-style: disc; padding-left: 1.5rem; margin-bottom: 1rem;">
-                    <li><strong>Standalone:</strong> Each Performance Statement is a standalone sentence and includes 1) action and 2) at least one of the following: impact or results/outcome.</li>
-                    <li><strong>Readability:</strong> Performance Statements are plain language and avoid using uncommon acronyms and abbreviations.</li>
-                </ul>
-                
-                <h4 style="font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem;">Format:</h4>
-                <ul style="list-style: disc; padding-left: 1.5rem; margin-bottom: 1rem;">
-                    <li>AF Form 1206, Nomination for Award (13 Mar 2024) remains the standard</li>
-                    <li>White space on the right margin is both accepted and expected</li>
-                    <li>No award nomination criteria may exceed one full page</li>
-                    <li>Bullets are not authorized</li>
-                </ul>
-                
-                <div class="example-box">
-                    <h4 style="font-weight: 600; margin-bottom: 0.75rem;">Example:</h4>
-                    <p><strong>Action and Impact or Results/Outcome:</strong></p>
-                    <p>Capt Snuffy <strong>led</strong> a survey team of 33 MCA to establish an XAB in support of a PACAF ACE exercise across 4 countries and including 7 allies, <strong>culminating</strong> in 153 sorties and 334 training events completed. She also <strong>championed</strong> a critical organizational merger of the squadron's maintenance and operations; results <strong>saved</strong> 360 maintenance workhours per week and <strong>increased</strong> sortie generation by 10%.</p>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="form-group">
-                        <label for="jobTitleContainer">Job Title/AFSC:</label>
-                        <div id="jobTitleContainer"></div>
-                    </div>
-                    <div id="otherJobField" class="form-group hidden">
-                        <label for="otherJobTitle">Specify Job Title:</label>
-                        <input type="text" id="otherJobTitle" placeholder="e.g., Program Manager">
-                    </div>
-                     <div class="form-group">
-                        <label for="majcomContainer">MAJCOM:</label>
-                        <div id="majcomContainer"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="mgaContainer">Major Graded Area (MGA):</label>
-                        <div id="mgaContainer"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="purposeContainer">Purpose:</label>
-                        <div id="purposeContainer"></div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="accomplishment">Accomplishment Details:</label>
-                    <textarea id="accomplishment" placeholder="Describe what you did with metrics in any format: bullet points, notes, sentences, or even stream of consciousness."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Airman Leadership Qualities (Select up to 3):</label>
-                    <div class="alq-container">
-                        <div class="alq-group">
-                            <h4 class="alq-header">Executing the Mission</h4>
-                            <div class="alq-options">
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq1" name="alq" value="Job Proficiency" class="alq-checkbox">
-                                    <label for="alq1" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Job Proficiency</span>
-                                    </label>
-                                </div>
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq2" name="alq" value="Initiative" class="alq-checkbox">
-                                    <label for="alq2" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Initiative</span>
-                                    </label>
-                                </div>
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq3" name="alq" value="Adaptability" class="alq-checkbox">
-                                    <label for="alq3" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Adaptability</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="alq-group">
-                            <h4 class="alq-header">Leading People</h4>
-                            <div class="alq-options">
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq4" name="alq" value="Inclusion & Teamwork" class="alq-checkbox">
-                                    <label for="alq4" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Inclusion & Teamwork</span>
-                                    </label>
-                                </div>
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq5" name="alq" value="Emotional Intelligence" class="alq-checkbox">
-                                    <label for="alq5" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Emotional Intelligence</span>
-                                    </label>
-                                </div>
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq6" name="alq" value="Communication" class="alq-checkbox">
-                                    <label for="alq6" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Communication</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="alq-group">
-                            <h4 class="alq-header">Managing Resources</h4>
-                            <div class="alq-options">
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq7" name="alq" value="Stewardship" class="alq-checkbox">
-                                    <label for="alq7" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Stewardship</span>
-                                    </label>
-                                </div>
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq8" name="alq" value="Accountability" class="alq-checkbox">
-                                    <label for="alq8" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Accountability</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="alq-group">
-                            <h4 class="alq-header">Improving the Unit</h4>
-                            <div class="alq-options">
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq9" name="alq" value="Decision Making" class="alq-checkbox">
-                                    <label for="alq9" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Decision Making</span>
-                                    </label>
-                                </div>
-                                <div class="alq-option">
-                                    <input type="checkbox" id="alq10" name="alq" value="Innovation" class="alq-checkbox">
-                                    <label for="alq10" class="alq-label">
-                                        <span class="alq-checkmark"></span>
-                                        <span>Innovation</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-						<div class="card-header">
-							<span> </span>
-							<button id="toggleAlqDescriptions" class="toggle-section">ⓘ Show ALQ Descriptions</button>
-						</div>
-						
-                        <div id="alqDescriptions" class="hidden alq-desc-container">
-                            <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-primary);">Airman Leadership Quality Definitions</h4>
-                            <ul style="list-style: disc; padding-left: 1.5rem; line-height: 1.8;">
-                                <li><strong>Job Proficiency:</strong> Demonstrates technical expertise and excels in performing assigned duties.</li>
-                                <li><strong>Initiative:</strong> Takes proactive action to seize opportunities without needing direction.</li>
-                                <li><strong>Adaptability:</strong> Adjusts to changing conditions and maintains performance under pressure.</li>
-                                <li><strong>Inclusion & Teamwork:</strong> Fosters collaboration and values diverse perspectives.</li>
-                                <li><strong>Emotional Intelligence:</strong> Recognizes and manages personal emotions and those of others.</li>
-                                <li><strong>Communication:</strong> Conveys ideas clearly and effectively at all organizational levels.</li>
-                                <li><strong>Stewardship:</strong> Responsibly manages time, money, equipment, and personnel.</li>
-                                <li><strong>Accountability:</strong> Takes ownership of actions and ensures tasks are completed to expectation.</li>
-                                <li><strong>Decision Making:</strong> Analyzes situations and makes sound, timely choices.</li>
-                                <li><strong>Innovation:</strong> Seeks creative solutions and implements improvements to enhance processes.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <button id="generateButton" class="btn btn-primary">Generate AI Prompt</button>
-            </div>
-        </div>
-
-        <div id="outputContainer" class="card hidden">
-            <div class="card-header">
-                <span>Generated AI Prompt</span>
-            </div>
-            <div class="card-body">
-                <div id="outputPrompt" class="output-box"></div>
-                <div class="mt-4">
-                    <button id="copyButton" class="btn btn-success">Copy Prompt</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <span>AI Resources</span>
-            </div>
-            <div class="card-body">
-                <p class="description-text">
-                    Paste your generated prompt in NIPRGPT or ASK SAGE.
-                </p>
-                <div class="button-group">
-                    <a href="https://niprgpt.mil/" target="_blank" rel="noopener noreferrer" class="ai-resource-link">
-                        <span class="ai-resource-icon">🤖</span>
-                        NIPRGPT
-                    </a>
-                    <a href="https://chat.asksage.mil" target="_blank" rel="noopener noreferrer" class="ai-resource-link">
-                        <span class="ai-resource-icon">💬</span>
-                        ASK SAGE
-                    </a>
-                </div>
-                <p class="description-text">
-                    Use NIPRGPT-V2 for best results.
-                </p>
-            </div>
-        </div>
-    </main>
-
-    <footer>
-        USAF Performance Statement AI Prompt Generator | For official use only
-    </footer>
-    
-   <div id="picker-overlay" class="picker-overlay">
-        <div class="picker-modal">
-            <div class="picker-header">
-                <input type="text" id="picker-search-input" placeholder="Type to search...">
-            </div>
-            <ul id="picker-options-list" class="picker-options-list">
-                <!-- Mobile options will be populated here -->
-            </ul>
-        </div>
+    <div id="title-container">
+        <h1>AI Tesseract</h1>
     </div>
 
-    <script>
-      // === Device Detection ===
-      const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    <!-- Links to your AI Tools -->
+    <div id="link1" class="link-container">
+        <a href="#" class="tool-link" onclick="loadTool('Acquisition Compass.html')">Acquisition Compass</a>
+    </div>
+    <div id="link2" class="link-container">
+        <a href="#" class="tool-link" onclick="loadTool('Agenda AI (1).html')">Agenda AI</a>
+    </div>
+    <div id="link3" class="link-container">
+        <a href="#" class="tool-link" onclick="loadTool('SparkLens.html')">SparkLens</a>
+    </div>
+    <div id="link4" class="link-container">
+        <a href="#" class="tool-link" onclick="loadTool('mmc generator.html')">MMC Generator</a>
+    </div>
 
-      // === Data ===
-      const afscOptions = [
-        { text: '-- Select Your AFSC/Job Title --', value: '' },
-        { text: 'DOD Government Civilian', value: 'DOD Government Civilian' },
-        { text: '11S - Special Operations Pilot', value: '11S - Special Operations Pilot' },
-        { text: '12S - Special Operations Combat Systems Officer', value: '12S - Special Operations Combat Systems Officer' },
-        { text: '14F - Information Operations Officer', value: '14F - Information Operations Officer' },
-        { text: '14N - Intelligence Officer', value: '14N - Intelligence Officer' },
-        { text: '15W - Weather Officer', value: '15W - Weather Officer' },
-        { text: '17S - Cyberspace Operations Officer', value: '17S - Cyberspace Operations Officer' },
-        { text: '17D - Cyberspace Operations Officer', value: '17D - Cyberspace Operations Officer' },
-        { text: '18S - Special Reconnaissance Officer', value: '18S - Special Reconnaissance Officer' },
-        { text: '19Z - Special Warfare Officer', value: '19Z - Special Warfare Officer' },
-        { text: '21A - Aircraft Maintenance Officer', value: '21A - Aircraft Maintenance Officer' },
-        { text: '21R - Logistics Readiness Officer', value: '21R - Logistics Readiness Officer' },
-        { text: '31P - Security Forces Officer', value: '31P - Security Forces Officer' },
-        { text: '32E - Civil Engineer', value: '32E - Civil Engineer' },
-        { text: '35P - Public Affairs Officer', value: '35P - Public Affairs Officer' },
-        { text: '38F - Force Support Officer', value: '38F - Force Support Officer' },
-        { text: '41A - Health Services Administrator', value: '41A - Health Services Administrator' },
-        { text: '51J - Judge Advocate', value: '51J - Judge Advocate' },
-        { text: '52R - Chaplain', value: '52R - Chaplain' },
-        { text: '65F - Financial Management Officer', value: '65F - Financial Management Officer' },
-        { text: '87I - Contracting Officer', value: '87I - Contracting Officer' },
-        { text: '9E0 - Logistics Readiness Officer', value: '9E0 - Logistics Readiness Officer' },
-        { text: '1A1 - Career Enlisted Aviator', value: '1A1 - Career Enlisted Aviator' },
-        { text: '1B4 - Cyber Warfare Operations', value: '1B4 - Cyber Warfare Operations' },
-        { text: '1C0 - Aviation Resource Management', value: '1C0 - Aviation Resource Management' },
-        { text: '1C1 - Air Traffic Control', value: '1C1 - Air Traffic Control' },
-        { text: '1C3 - Command and Control Operations', value: '1C3 - Command and Control Operations' },
-        { text: '1C5 - Battle Management Operations', value: '1C5 - Battle Management Operations' },
-        { text: '1C8 - Radar, Airfield & Weather Systems', value: '1C8 - Radar, Airfield & Weather Systems' },
-        { text: '1D7 - Cyber Defense Operations', value: '1D7 - Cyber Defense Operations' },
-        { text: '1N0 - All-Source Intelligence Analyst', value: '1N0 - All-Source Intelligence Analyst' },
-        { text: '1N1 - Geospatial Intelligence', value: '1N1 - Geospatial Intelligence' },
-        { text: '1N2 - Signals Intelligence Analyst', value: '1N2 - Signals Intelligence Analyst' },
-        { text: '1N4 - Fusion Analyst', value: '1N4 - Fusion Analyst' },
-        { text: '1N7 - Human Intelligence Specialist', value: '1N7 - Human Intelligence Specialist' },
-        { text: '1P0 - Aircrew Flight Equipment', value: '1P0 - Aircrew Flight Equipment' },
-        { text: '1S0 - Safety', value: '1S0 - Safety' },
-        { text: '1T0 - Survival, Evasion, Resistance & Escape (SERE) Specialist', value: '1T0 - Survival, Evasion, Resistance & Escape (SERE) Specialist' },
-        { text: '1W0 - Weather', value: '1W0 - Weather' },
-        { text: '1Z1 - Pararescue', value: '1Z1 - Pararescue' },
-        { text: '1Z2 - Combat Control', value: '1Z2 - Combat Control' },
-        { text: '1Z3 - TACP', value: '1Z3 - TACP' },
-        { text: '1Z4 - Special Reconnaissance', value: '1Z4 - Special Reconnaissance' },
-        { text: '2A3 - Acft Mx', value: '2A3 - Acft Mx' },
-        { text: '2A5 - Aerospace Maintenance', value: '2A5 - Aerospace Maintenance' },
-        { text: '2A6 - Aircraft Systems', value: '2A6 - Aircraft Systems' },
-        { text: '2A7 - Combined Low Observable and Acft Structual Mx', value: '2A7 - Combined Low Observable and Acft Structual Mx' },
-        { text: '2A9 - Aerospace Maintenance (Non-Destructive Inspection)', value: '2A9 - Aerospace Maintenance (Non-Destructive Inspection)' },
-        { text: '2G0 - Logistics Plans', value: '2G0 - Logistics Plans' },
-        { text: '2R2 - Maintenance Management', value: '2R2 - Maintenance Management' },
-        { text: '2S0 - Materiel Management', value: '2S0 - Materiel Management' },
-        { text: '2T0 - Traffic Management Operations', value: '2T0 - Traffic Management Operations' },
-        { text: '2T1 - Ground Transportation', value: '2T1 - Ground Transportation' },
-        { text: '2T2 - Air Transportation', value: '2T2 - Air Transportation' },
-        { text: '2T3X1 - Vehicle Maintenance', value: '2T3X1 - Vehicle Maintenance' },
-        { text: '2T3X7 - Vehicle Fleet Management', value: '2T3X7 - Vehicle Fleet Management' },
-        { text: '2W0 - Munitions Systems', value: '2W0 - Munitions Systems' },
-        { text: '2W1 - Aircraft Armament Systems', value: '2W1 - Aircraft Armament Systems' },
-        { text: '3E0 - Electrical Systems', value: '3E0 - Electrical Systems' },
-        { text: '3E1 - Heating, Ventilation, AC, and Refrigeration', value: '3E1 - Heating, Ventilation, AC, and Refrigeration' },
-        { text: '3E2 - Heavy Equipment', value: '3E2 - Heavy Equipment' },
-        { text: '3E3 - Structures', value: '3E3 - Structures' },
-        { text: '3E4 - Pest Management', value: '3E4 - Pest Management' },
-        { text: '3E5 - Engineering', value: '3E5 - Engineering' },
-        { text: '3E6 - Operations Management', value: '3E6 - Operations Management' },
-        { text: '3E7 - Fire Protection', value: '3E7 - Fire Protection' },
-        { text: '3E8 - Explosive Ordnance Disposal', value: '3E8 - Explosive Ordnance Disposal' },
-        { text: '3E9 - Emergency Management', value: '3E9 - Emergency Management' },
-        { text: '3F0 - Personnel', value: '3F0 - Personnel' },
-        { text: '3F1 - Services', value: '3F1 - Services' },
-        { text: '3F2 - Education and Training', value: '3F2 - Education and Training' },
-        { text: '3F3 - Manpower', value: '3F3 - Manpower' },
-        { text: '3F4 - Equal Opportunity', value: '3F4 - Equal Opportunity' },
-        { text: '3F5 - Administration', value: '3F5 - Administration' },
-        { text: '3N0 - Public Affairs', value: '3N0 - Public Affairs' },
-        { text: '3N1 - Regional Bands', value: '3N1 - Regional Bands' },
-        { text: '3P0 - Security Forces', value: '3P0 - Security Forces' },
-        { text: '4A1 - Medical Materiel', value: '4A1 - Medical Materiel' },
-        { text: '4B0 - Bioenvironmental Engineering', value: '4B0 - Bioenvironmental Engineering' },
-        { text: '4N0 - Aerospace Medical Service', value: '4N0 - Aerospace Medical Service' },
-        { text: '4R0 - Radiology', value: '4R0 - Radiology' },
-        { text: '5J0 - Paralegal', value: '5J0 - Paralegal' },
-        { text: '5R0 - Chaplain Assistant', value: '5R0 - Chaplain Assistant' },
-        { text: '6F0 - Financial Management and Comptroller', value: '6F0 - Financial Management and Comptroller' },
-        { text: '7S - OSI Enlisted', value: '7S - OSI Enlisted' },
-        { text: '8C000 - MFR NCO', value: '8C000 - MFR NCO' },
-        { text: '8F0 - First Sergeant', value: '8F0 - First Sergeant' },
-        { text: '8H000 - Airman Dorm Leader', value: '8H000 - Airman Dorm Leader' },
-        { text: '8I0 - Inspector General', value: '8I0 - Inspector General' },
-        { text: '8R - Recruiters', value: '8R - Recruiters' },
-        { text: '8T000 - Professional Military Education Instructor', value: '8T000 - Professional Military Education Instructor' },
-        { text: 'Other (Specify Below)', value: 'other' }
-      ];
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-      const majcomOptions = [
-        { text: '-- Select Your MAJCOM --', value: '' },
-        { text: 'Air Combat Command (ACC)', value: 'Air Combat Command (ACC)' },
-        { text: 'Air Education and Training Command (AETC)', value: 'Air Education and Training Command (AETC)' },
-        { text: 'Air Force Global Strike Command (AFGSC)', value: 'Air Force Global Strike Command (AFGSC)' },
-        { text: 'Air Force Materiel Command (AFMC)', value: 'Air Force Materiel Command (AFMC)' },
-        { text: 'Air Force Reserve Command (AFRC)', value: 'Air Force Reserve Command (AFRC)' },
-        { text: 'Air Force Special Operations Command (AFSOC)', value: 'Air Force Special Operations Command (AFSOC)' },
-        { text: 'Air Mobility Command (AMC)', value: 'Air Mobility Command (AMC)' },
-        { text: 'Pacific Air Forces (PACAF)', value: 'Pacific Air Forces (PACAF)' },
-        { text: 'U.S. Air Forces in Europe – Air Forces Africa (USAFE-AFAFRICA)', value: 'U.S. Air Forces in Europe – Air Forces Africa (USAFE-AFAFRICA)' },
-        { text: 'Air Force Medical Command (AFMEDCOM)', value: 'Air Force Medical Command (AFMEDCOM)' },
-        { text: 'Air National Guard Readiness Center (ANGRC)', value: 'Air National Guard Readiness Center (ANGRC)' },
-        { text: 'Headquarters Air Force (HAF)', value: 'Headquarters Air Force (HAF)' },
-        { text: 'Air Force Southern Command (AFSOUTH)', value: 'Air Force Southern Command (AFSOUTH)' },
-        { text: 'U.S. Air Forces Central (AFCENT)', value: 'U.S. Air Forces Central (AFCENT)' },
-      ];
+        // --- Basic Three.js Setup ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.body.appendChild(renderer.domElement);
 
-      const mgaOptions = [
-        { text: '-- Select Major Graded Area --', value: '' },
-        { text: 'Executing the Mission', value: 'Executing the Mission' },
-        { text: 'Leading People', value: 'Leading People' },
-        { text: 'Managing Resources', value: 'Managing Resources' },
-        { text: 'Improving the Unit', value: 'Improving the Unit' }
-      ];
+        camera.position.z = 8; // Pulled camera back slightly
 
-      const purposeOptions = [
-        { text: 'Award Package (AF Form 1206)', value: 'award' },
-        { text: 'Enlisted Performance Brief (EPB)', value: 'epr' },
-        { text: 'Officer Performance Brief (OPB)', value: 'opr' },
-        { text: 'Weekly Civilian Performance', value: 'weekly' }
-      ];
+        // --- Post-processing for Glow Effect ---
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0;
+        bloomPass.strength = 1.8;
+        bloomPass.radius = 0.6;
 
-      // === Picker/Dropdown Logic ===
-      const pickerOverlay = document.getElementById('picker-overlay');
-      const pickerOptionsList = document.getElementById('picker-options-list');
-      const pickerSearchInput = document.getElementById('picker-search-input');
-      
-      let pickerState = {
-          targetElement: null,
-          options: [],
-      };
+        const composer = new EffectComposer(renderer);
+        composer.addPass(renderScene);
+        composer.addPass(bloomPass);
 
-      // --- Mobile Picker Logic (New and Improved) ---
-      function openPicker(target, options) {
-          pickerState.targetElement = target;
-          pickerState.options = options;
-          pickerSearchInput.value = '';
-          populatePickerOptions(options);
-          pickerOverlay.classList.add('visible');
-          pickerSearchInput.focus();
-      }
-
-      function closePicker() {
-          pickerOverlay.classList.remove('visible');
-          pickerState.targetElement = null;
-      }
-
-      function populatePickerOptions(options) {
-          pickerOptionsList.innerHTML = '';
-          options.forEach(option => {
-              const li = document.createElement('li');
-              li.className = 'picker-option-item';
-              li.textContent = option.text;
-              li.dataset.value = option.value;
-              li.addEventListener('click', () => {
-                  selectPickerOption(option);
-              });
-              pickerOptionsList.appendChild(li);
-          });
-      }
-
-      function selectPickerOption(option) {
-          if (pickerState.targetElement) {
-              pickerState.targetElement.querySelector('span').textContent = option.text;
-              pickerState.targetElement.dataset.value = option.value;
-              
-              if (pickerState.targetElement.id === 'jobTitle') {
-                  document.getElementById('otherJobField').classList.toggle('hidden', option.value !== 'other');
-              }
-          }
-          closePicker();
-      }
-
-      pickerSearchInput.addEventListener('input', (e) => {
-          const searchTerm = e.target.value.toLowerCase();
-          const filteredOptions = pickerState.options.filter(opt => 
-              opt.text.toLowerCase().includes(searchTerm)
-          );
-          populatePickerOptions(filteredOptions);
-      });
-
-      // --- Desktop Dropdown Logic ---
-      function createCustomDropdown(options, initialValue, id) {
-        const initialOption = options.find(opt => opt.value === initialValue) || options[0];
-        const dropdown = document.createElement('div');
-        dropdown.id = id;
-        dropdown.className = 'custom-dropdown';
-        dropdown.dataset.value = initialOption.value;
+        // --- Starfield Particle System ---
+        const starVertices = [];
+        const starColors = [];
+        const starColorTypes = [
+            new THREE.Color(0xffffff), // White
+            new THREE.Color(0xaad8ff), // Light Blue
+            new THREE.Color(0xffc0a0)  // Red-Orange
+        ];
+        for (let i = 0; i < 15000; i++) {
+            const x = THREE.MathUtils.randFloatSpread(300);
+            const y = THREE.MathUtils.randFloatSpread(300);
+            const z = THREE.MathUtils.randFloatSpread(300);
+            starVertices.push(x, y, z);
+            const color = starColorTypes[Math.floor(Math.random() * starColorTypes.length)];
+            starColors.push(color.r, color.g, color.b);
+        }
+        const starGeometry = new THREE.BufferGeometry();
+        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+        starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
+        const starMaterial = new THREE.PointsMaterial({ size: 0.1, vertexColors: true });
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        scene.add(stars);
         
-        const selectedDisplay = document.createElement('div');
-        selectedDisplay.className = 'custom-dropdown-selected';
-        selectedDisplay.innerHTML = `<span>${initialOption.text}</span>`;
-        
-        dropdown.appendChild(selectedDisplay);
-        return dropdown;
-      }
-
-      function initDesktopDropdown(dropdown, options) {
-        dropdown.addEventListener('click', (e) => {
-            e.stopPropagation();
-            createFloatingDropdown(dropdown, options);
+        // --- Meteors ---
+        const meteorGeometry = new THREE.BufferGeometry();
+        const meteorVertices = [];
+        for (let i = 0; i < 20; i++) {
+            meteorVertices.push(
+                THREE.MathUtils.randFloatSpread(500),
+                THREE.MathUtils.randFloat(300, 400),
+                THREE.MathUtils.randFloat(-300, -100)
+            );
+        }
+        meteorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(meteorVertices, 3));
+        const meteorMaterial = new THREE.PointsMaterial({
+            color: 0xffffff, size: 0.3, transparent: true,
+            blending: THREE.AdditiveBlending, depthWrite: false
         });
-      }
+        const meteors = new THREE.Points(meteorGeometry, meteorMaterial);
+        scene.add(meteors);
 
-      function createFloatingDropdown(parentDropdown, options) {
-          closeAllDropdowns();
-          const panel = document.createElement('div');
-          panel.id = 'floating-dropdown-panel';
-          panel.className = 'floating-dropdown-options';
-          
-          const searchInput = document.createElement('input');
-          searchInput.type = 'text';
-          searchInput.placeholder = 'Type to search...';
-          searchInput.style.cssText = `
-              width: 100%; padding: 0.5rem 0.75rem; border: none; 
-              border-bottom: 1px solid var(--border-color); background: transparent; 
-              color: var(--text-primary); outline: none; margin-bottom: 0.25rem;
-          `;
-          panel.appendChild(searchInput);
-          
-          const optionsContainer = document.createElement('div');
-          
-          const renderOptions = (filter = '') => {
-              optionsContainer.innerHTML = '';
-              options
-                  .filter(opt => opt.text.toLowerCase().includes(filter.toLowerCase()))
-                  .forEach(opt => {
-                      const optionEl = document.createElement('div');
-                      optionEl.className = 'floating-dropdown-option';
-                      optionEl.textContent = opt.text;
-                      if (parentDropdown.dataset.value === opt.value) {
-                          optionEl.classList.add('selected');
-                      }
-                      optionEl.addEventListener('click', () => {
-                          parentDropdown.dataset.value = opt.value;
-                          parentDropdown.querySelector('span').textContent = opt.text;
-                          if (parentDropdown.id === 'jobTitle') {
-                              document.getElementById('otherJobField').classList.toggle('hidden', opt.value !== 'other');
-                          }
-                          closeAllDropdowns();
-                      });
-                      optionsContainer.appendChild(optionEl);
-                  });
-          };
+        // --- Spaceships ---
+        const spaceships = new THREE.Group();
+        const shipGeometry = new THREE.ConeGeometry(0.05, 0.25, 8);
+        const shipMaterial = new THREE.MeshBasicMaterial({ color: 0x9ca3af });
+        for (let i = 0; i < 15; i++) {
+            const ship = new THREE.Mesh(shipGeometry, shipMaterial);
+            ship.position.set(
+                THREE.MathUtils.randFloatSpread(80),
+                THREE.MathUtils.randFloatSpread(80),
+                THREE.MathUtils.randFloatSpread(40) - 40
+            );
+            ship.rotation.x = Math.PI / 2;
+            ship.velocity = new THREE.Vector3(0, 0, THREE.MathUtils.randFloat(0.05, 0.15));
+            spaceships.add(ship);
+        }
+        scene.add(spaceships);
 
-          searchInput.addEventListener('input', () => renderOptions(searchInput.value));
-          panel.appendChild(optionsContainer);
-          document.body.appendChild(panel);
-          
-          const rect = parentDropdown.getBoundingClientRect();
-          panel.style.left = `${rect.left}px`;
-          panel.style.top = `${rect.bottom + 4}px`;
-          panel.style.width = `${rect.width}px`;
 
-          renderOptions();
-          searchInput.focus();
-          panel.addEventListener('click', e => e.stopPropagation());
-      }
+        // --- Tesseract Geometry ---
+        const points4D = [];
+        for (let i = 0; i < 16; i++) {
+            points4D.push(new THREE.Vector4(
+                (i & 1) ? -1 : 1, (i & 2) ? -1 : 1,
+                (i & 4) ? -1 : 1, (i & 8) ? -1 : 1
+            ));
+        }
+        const edges = [
+            0, 1, 0, 2, 0, 4, 0, 8, 1, 3, 1, 5, 1, 9, 2, 3, 2, 6, 2, 10,
+            3, 7, 3, 11, 4, 5, 4, 6, 4, 12, 5, 7, 5, 13, 6, 7, 6, 14,
+            7, 15, 8, 9, 8, 10, 8, 12, 9, 11, 9, 13, 10, 11, 10, 14,
+            11, 15, 12, 13, 12, 14, 13, 15, 14, 15
+        ];
 
-      function closeAllDropdowns() {
-        const existingPanel = document.getElementById('floating-dropdown-panel');
-        if (existingPanel) existingPanel.remove();
-      }
+        // --- Create Tesseracts ---
+        function createTesseract(color, scale, linewidth) {
+            const material = new THREE.LineBasicMaterial({ color: color, linewidth: linewidth });
+            const tesseractGroup = new THREE.Group();
+            tesseractGroup.scale.set(scale, scale, scale);
+            tesseractGroup.children.material = material; 
+            scene.add(tesseractGroup);
+            return tesseractGroup;
+        }
 
-      // --- Main Initialization ---
-      function createResponsiveSelect(containerId, options, initialValue) {
-        const container = document.getElementById(containerId);
-        const id = containerId.replace('Container', '');
+        const tesseract1 = createTesseract(0xa855f7, 2.5, 2);
+        const tesseract2 = createTesseract(0x3b82f6, 2.8, 1);
         
-        const initialOption = options.find(opt => opt.value === initialValue) || options[0];
-        
-        let selectControl;
+        // --- Glowing Vertex Particles ---
+        const particleTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/sprites/spark1.png');
+        const particleMaterial = new THREE.PointsMaterial({
+            color: 0xffffff, size: 0.4, map: particleTexture,
+            blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
+        });
+        const particleGeometry = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(16 * 3);
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        const vertexParticles = new THREE.Points(particleGeometry, particleMaterial);
+        tesseract1.add(vertexParticles);
 
-        if (isTouchDevice) {
-            selectControl = document.createElement('div');
-            selectControl.id = id;
-            selectControl.className = 'custom-picker-input';
-            selectControl.dataset.value = initialOption.value;
-            selectControl.innerHTML = `<span>${initialOption.text}</span>`;
-            selectControl.addEventListener('click', () => openPicker(selectControl, options));
-        } else {
-            selectControl = createCustomDropdown(options, initialValue, id);
-            initDesktopDropdown(selectControl, options);
+        // --- Mouse Controls ---
+        let mouseX = 0, mouseY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        }, false);
+
+        // --- Animation Loop ---
+        function projectAndDraw(tesseractGroup, angle4D) {
+            const projectedPoints3D = [];
+            points4D.forEach(p4 => {
+                const p = p4.clone();
+                const rotationXY = angle4D;
+                const rotationZW = angle4D * 0.4;
+                
+                let x = p.x * Math.cos(rotationXY) - p.y * Math.sin(rotationXY);
+                let y = p.x * Math.sin(rotationXY) + p.y * Math.cos(rotationXY);
+                p.x = x; p.y = y;
+                
+                let z = p.z * Math.cos(rotationZW) - p.w * Math.sin(rotationZW);
+                let w = p.z * Math.sin(rotationZW) + p.w * Math.cos(rotationZW);
+                p.z = z; p.w = w;
+
+                const distance = 4;
+                const w_proj = 1 / (distance - p.w);
+                projectedPoints3D.push(new THREE.Vector3(p.x * w_proj, p.y * w_proj, p.z * w_proj));
+            });
+
+            const lines = tesseractGroup.children.filter(c => c.isLine);
+            if (lines.length === 0) {
+                 for (let i = 0; i < edges.length; i += 2) {
+                    const geometry = new THREE.BufferGeometry();
+                    const line = new THREE.Line(geometry, tesseractGroup.children.material);
+                    tesseractGroup.add(line);
+                }
+            }
+            
+            tesseractGroup.children.filter(c => c.isLine).forEach((line, i) => {
+                 line.geometry.setFromPoints([
+                    projectedPoints3D[edges[i*2]],
+                    projectedPoints3D[edges[i*2 + 1]]
+                ]);
+            });
+
+            if (tesseractGroup === tesseract1) {
+                const positions = vertexParticles.geometry.attributes.position.array;
+                for (let i = 0; i < 16; i++) {
+                    positions[i * 3] = projectedPoints3D[i].x;
+                    positions[i * 3 + 1] = projectedPoints3D[i].y;
+                    positions[i * 3 + 2] = projectedPoints3D[i].z;
+                }
+                vertexParticles.geometry.attributes.position.needsUpdate = true;
+            }
         }
         
-        container.innerHTML = '';
-        container.appendChild(selectControl);
-      }
+        const links = [
+            { el: document.getElementById('link1'), x: 20, y: 25, speed: 0.2, amp: 2 },
+            { el: document.getElementById('link2'), x: 80, y: 25, speed: 0.25, amp: 2.5 },
+            { el: document.getElementById('link3'), x: 20, y: 75, speed: 0.15, amp: 3 },
+            { el: document.getElementById('link4'), x: 80, y: 75, speed: 0.3, amp: 2 }
+        ];
 
-      document.addEventListener('DOMContentLoaded', function() {
-        // Initialize all dropdowns
-        createResponsiveSelect('jobTitleContainer', afscOptions, '');
-        createResponsiveSelect('majcomContainer', majcomOptions, '');
-        createResponsiveSelect('mgaContainer', mgaOptions, '');
-        createResponsiveSelect('purposeContainer', purposeOptions, 'award');
+        const clock = new THREE.Clock();
 
-        // Toggle "How to Use This Tool" section
-        document.getElementById('howToUseToggle').addEventListener('click', function() {
-            const howToUseBody = document.getElementById('howToUseBody');
-            howToUseBody.classList.toggle('hidden');
-            this.textContent = howToUseBody.classList.contains('hidden') ? 'ⓘ Show Instructions' : '✕ Hide Instructions';
-        });
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
 
-        // Toggle reference section
-        document.getElementById('toggleReference').addEventListener('click', function() {
-            const referenceSection = document.getElementById('referenceSection');
-            referenceSection.classList.toggle('hidden');
-            this.textContent = referenceSection.classList.contains('hidden') ? 'ⓘ Show Guidance' : '✕ Hide Guidance';
-        });
+            projectAndDraw(tesseract1, time * 0.5);
+            projectAndDraw(tesseract2, time * 0.3);
 
-        // Toggle ALQ descriptions
-        document.getElementById('toggleAlqDescriptions').addEventListener('click', function() {
-            const alqDescriptions = document.getElementById('alqDescriptions');
-            alqDescriptions.classList.toggle('hidden');
-            this.textContent = alqDescriptions.classList.contains('hidden') ? 'ⓘ Show ALQ Descriptions' : '✕ Hide ALQ Descriptions';
-        });
+            const targetRotationX = mouseY * 0.0005;
+            const targetRotationY = mouseX * 0.0005;
+            
+            const rotationGroup = scene;
+            rotationGroup.rotation.x += 0.05 * (targetRotationX - rotationGroup.rotation.x);
+            rotationGroup.rotation.y += 0.05 * (targetRotationY - rotationGroup.rotation.y);
 
-        // ALQ checkbox handling with max 3 selections
-        let selectedAlqsOrder = [];
-        document.querySelectorAll('.alq-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const id = this.id;
-                selectedAlqsOrder = selectedAlqsOrder.filter(item => item !== id);
-                if (this.checked) {
-                    selectedAlqsOrder.push(id);
-                    if (selectedAlqsOrder.length > 3) {
-                        const oldestId = selectedAlqsOrder.shift();
-                        document.getElementById(oldestId).checked = false;
+            stars.rotation.y += delta * 0.005;
+
+            // Animate Meteors
+            meteorGeometry.attributes.position.array.forEach((val, i) => {
+                if (i % 3 === 1) { // y-coordinate
+                    meteorGeometry.attributes.position.array[i] -= 2;
+                    if (meteorGeometry.attributes.position.array[i] < -200) {
+                        meteorGeometry.attributes.position.array[i] = 200;
                     }
                 }
             });
-        });
+            meteorGeometry.attributes.position.needsUpdate = true;
 
-        // Copy button
-        document.getElementById('copyButton').addEventListener('click', function() {
-            const promptText = document.getElementById('outputPrompt').textContent;
-            // Use execCommand for broader compatibility in sandboxed environments
-            const textArea = document.createElement("textarea");
-            textArea.value = promptText;
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                this.textContent = 'Copied!';
-            } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-                this.textContent = 'Error';
-            }
-            document.body.removeChild(textArea);
-            setTimeout(() => { this.textContent = 'Copy Prompt'; }, 2000);
-        });
+            // Animate Spaceships
+            spaceships.children.forEach(ship => {
+                ship.position.add(ship.velocity);
+                if (ship.position.z > 50) {
+                    ship.position.z = -50;
+                    ship.position.x = THREE.MathUtils.randFloatSpread(80);
+                    ship.position.y = THREE.MathUtils.randFloatSpread(80);
+                }
+            });
+            
+            links.forEach((link, i) => {
+                const newX = link.x + Math.sin(time * link.speed + i) * link.amp;
+                const newY = link.y + Math.cos(time * link.speed * 0.7 + i) * link.amp;
+                link.el.style.left = `${newX}%`;
+                link.el.style.top = `${newY}%`;
+            });
+
+            composer.render();
+        }
+
+        // --- Window Resize ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        }, false);
         
-        // Generate button
-        document.getElementById('generateButton').addEventListener('click', function() {
-            const getElValue = (id) => document.getElementById(id)?.dataset.value || '';
-            
-            let jobTitle = getElValue('jobTitle');
-            if (jobTitle === 'other') {
-                jobTitle = document.getElementById('otherJobTitle').value.trim() || 'Unspecified Job Title';
-            }
+        // --- Link Loading Function ---
+        window.loadTool = function(toolName) {
+            alert(`Loading tool: ${toolName}`);
+        }
 
-            const selectedMajcom = getElValue('majcom');
-            const selectedMGA = getElValue('mga');
-            const accomplishment = document.getElementById('accomplishment').value.trim();
-            const purpose = getElValue('purpose');
-
-            if (!jobTitle || !selectedMajcom || !selectedMGA || !accomplishment) {
-                // In a real app, you'd show a custom modal here instead of an alert.
-                // For this tool, we'll log to console and skip generation.
-                console.error('Please fill in all required fields: Job Title, MAJCOM, Major Graded Area, and Accomplishment.');
-                // You could show a temporary error message on the page here.
-                return;
-            }
-
-            const selectedAlqs = Array.from(document.querySelectorAll('input[name="alq"]:checked')).map(cb => cb.value);
-            let alqSection = selectedAlqs.length > 0 ? 'Airman Leadership Qualities (ALQs) to highlight:\n' + selectedAlqs.join(', ') + '\n\n' : '';
-
-            const commonInstructions = `You are a USAF writing assistant specializing in crafting effective performance statements.
-
-Job Title/AFSC: ${jobTitle}
-MAJCOM: ${selectedMajcom}
-Major Graded Area (MGA): ${selectedMGA}
-
-My accomplishment:
-${accomplishment}
-
-${alqSection}Please convert this into 5-7 proper USAF Performance Statements following these guidelines:
-- Each statement is a standalone sentence.
-- Include an action and at least one impact or result.
-- The impact must relate to the MAJCOM's mission and the selected MGA.
-- Use plain language and avoid uncommon acronyms.
-- Emphasize leadership, mission impact, and quantifiable results.`;
-
-            let prompt = '';
-            
-            switch(purpose) {
-                case 'weekly':
-                    prompt = `${commonInstructions}\n\nPlease create 5-7 performance statements suitable for a Weekly Civilian Performance report that highlights my most significant contributions this week. Focus on mission impact and demonstrate impact appropriate for the employee's position.\n\nIMPORTANT: Each statement MUST be EXACTLY 250 characters long (including spaces and punctuation). Provide only the formatted statements.`;
-                    break;
-                case 'award':
-                    prompt = `${commonInstructions}\n\nPlease create 5-7 performance statements suitable for an AF Form 1206 Award Package. Statements should be impactful, showcase leadership, and emphasize quantifiable results.\n\nIMPORTANT: Each statement MUST be EXACTLY 250 characters long (including spaces and punctuation). Provide only the formatted statements.`;
-                    break;
-                case 'epr':
-                    prompt = `${commonInstructions}\n\nPlease create 5-7 performance statements suitable for an Enlisted Performance Brief (EPB). Focus on duty performance, leadership/followership, and whole airman concept.\n\nIMPORTANT: Each statement MUST be EXACTLY 175 characters long (including spaces and punctuation). Provide only the formatted statements.`;
-                    break;
-                case 'opr':
-                    prompt = `${commonInstructions}\n\nPlease create 5-7 performance statements suitable for an Officer Performance Brief (OPB). Focus on leadership, mission accomplishment, and professional qualities.\n\nIMPORTANT: Each statement MUST be EXACTLY 175 characters long (including spaces and punctuation). Provide only the formatted statements.`;
-                    break;
-            }
-
-            document.getElementById('outputPrompt').textContent = prompt;
-            const outputContainer = document.getElementById('outputContainer');
-            outputContainer.classList.remove('hidden');
-            outputContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-
-        // Global click listener to close dropdowns/pickers
-        window.addEventListener('click', () => {
-            if (!isTouchDevice) {
-                closeAllDropdowns();
-            }
-        });
-        pickerOverlay.addEventListener('click', (e) => {
-            if (e.target === pickerOverlay) {
-                closePicker();
-            }
-        });
-      });
-      // --- Visitor Counter Logic ---
-            const visitorCountElement = document.getElementById('visitor-count');
-            // This is a simple simulation. For a real site, you'd fetch this from a server.
-            let count = 1234; 
-            const siteVisitKey = 'siteVisited_epbTool'; // Change this key for each site for a unique counter
-
-            if (!localStorage.getItem(siteVisitKey)) {
-              count++;
-             localStorage.setItem(siteVisitKey, 'true');
-            }
-
-            visitorCountElement.textContent = count.toLocaleString();
-
+        animate();
     </script>
-    <div class="visitor-counter">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2 1H6a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2z"/>
-        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/>
-    </svg>
-    <span id="visitor-count">1,234</span>
-    <span>Visitors</span>
-</div>
-
 </body>
 </html>
