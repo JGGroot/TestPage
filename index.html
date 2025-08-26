@@ -98,6 +98,18 @@
             from { text-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
             to { text-shadow: 0 0 35px rgba(96, 165, 250, 0.6); }
         }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .tool-link {
+                width: 120px;
+                height: 120px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -257,20 +269,9 @@
         const vertexParticles = new THREE.Points(particleGeometry, particleMaterial);
         tesseract1.add(vertexParticles);
 
-        // --- Input Controls (Mouse and Gyro) ---
-        let mouseX = 0, mouseY = 0;
+        // --- Input Controls (Gyro and fallback rotation) ---
         let targetRotationX = 0, targetRotationY = 0;
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
         let motionControlEnabled = false;
-
-        // Mouse Listener
-        document.addEventListener('mousemove', (event) => {
-            if (!motionControlEnabled) {
-                mouseX = (event.clientX - windowHalfX);
-                mouseY = (event.clientY - windowHalfY);
-            }
-        }, false);
 
         // Gyro Listener Setup
         const motionButton = document.getElementById('motion-control-button');
@@ -281,7 +282,10 @@
             const beta = Math.max(-90, Math.min(90, event.beta));
             const gamma = Math.max(-90, Math.min(90, event.gamma));
 
-            // Map tilt to rotation, scaling it similarly to the mouse input
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            // Map tilt to rotation
             targetRotationY = (gamma / 90) * (windowHalfX * 0.001);
             targetRotationX = (beta / 90) * (windowHalfY * 0.001);
         }
@@ -301,9 +305,11 @@
             });
         } else if ('DeviceOrientationEvent' in window) {
             // Non-iOS 13+ devices that support the event
-            window.addEventListener('deviceorientation', handleOrientation);
-            motionControlEnabled = true;
-            motionButton.style.display = 'none';
+             motionButton.addEventListener('click', () => {
+                window.addEventListener('deviceorientation', handleOrientation);
+                motionControlEnabled = true;
+                motionButton.style.display = 'none';
+            });
         } else {
             // No motion support, hide the button
             motionButton.style.display = 'none';
@@ -359,10 +365,10 @@
         }
         
         const links = [
-            { el: document.getElementById('link1'), x: 20, y: 25, speed: 0.2, amp: 2 },
-            { el: document.getElementById('link2'), x: 80, y: 25, speed: 0.25, amp: 2.5 },
-            { el: document.getElementById('link3'), x: 20, y: 75, speed: 0.15, amp: 3 },
-            { el: document.getElementById('link4'), x: 80, y: 75, speed: 0.3, amp: 2 }
+            { el: document.getElementById('link1'), x: 25, y: 25, speed: 0.2, amp: 2 },
+            { el: document.getElementById('link2'), x: 75, y: 25, speed: 0.25, amp: 2.5 },
+            { el: document.getElementById('link3'), x: 25, y: 75, speed: 0.15, amp: 3 },
+            { el: document.getElementById('link4'), x: 75, y: 75, speed: 0.3, amp: 2 }
         ];
 
         const clock = new THREE.Clock();
@@ -375,15 +381,17 @@
             projectAndDraw(tesseract1, time * 0.5);
             projectAndDraw(tesseract2, time * 0.3);
 
-            // Update target rotation based on input
-            if (!motionControlEnabled) {
-                targetRotationX = mouseY * 0.0005;
-                targetRotationY = mouseX * 0.0005;
-            }
-            
             const rotationGroup = scene;
-            rotationGroup.rotation.x += 0.05 * (targetRotationX - rotationGroup.rotation.x);
-            rotationGroup.rotation.y += 0.05 * (targetRotationY - rotationGroup.rotation.y);
+            
+            if (motionControlEnabled) {
+                // Gyro control
+                rotationGroup.rotation.x += 0.05 * (targetRotationX - rotationGroup.rotation.x);
+                rotationGroup.rotation.y += 0.05 * (targetRotationY - rotationGroup.rotation.y);
+            } else {
+                // Default auto-rotation for desktop
+                rotationGroup.rotation.y += delta * 0.05;
+                rotationGroup.rotation.x += delta * 0.02;
+            }
 
             stars.rotation.y += delta * 0.005;
 
