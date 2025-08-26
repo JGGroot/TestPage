@@ -43,6 +43,7 @@
             z-index: 10;
             transform: translate(-50%, -50%);
             perspective: 1000px;
+            transition: transform 0.1s linear; /* Smooth parallax effect */
         }
         .tool-link {
             display: flex;
@@ -269,29 +270,38 @@
         const vertexParticles = new THREE.Points(particleGeometry, particleMaterial);
         tesseract1.add(vertexParticles);
 
-        // --- Input Controls (Gyro and fallback rotation) ---
+        // --- Input Controls (Mouse, Gyro, and fallback rotation) ---
+        let mouseX = 0, mouseY = 0;
         let targetRotationX = 0, targetRotationY = 0;
         let motionControlEnabled = false;
+
+        // Mouse Listener
+        document.addEventListener('mousemove', (event) => {
+            if (!motionControlEnabled) {
+                const windowHalfX = window.innerWidth / 2;
+                const windowHalfY = window.innerHeight / 2;
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+                // Update target rotation directly from mouse
+                targetRotationY = mouseX * 0.0005;
+                targetRotationX = mouseY * 0.0005;
+            }
+        }, false);
 
         // Gyro Listener Setup
         const motionButton = document.getElementById('motion-control-button');
         
         function handleOrientation(event) {
-            // beta: front-back tilt (-180 to 180)
-            // gamma: left-right tilt (-90 to 90)
             const beta = Math.max(-90, Math.min(90, event.beta));
             const gamma = Math.max(-90, Math.min(90, event.gamma));
 
-            const windowHalfX = window.innerWidth / 2;
-            const windowHalfY = window.innerHeight / 2;
-
-            // Map tilt to rotation
-            targetRotationY = (gamma / 90) * (windowHalfX * 0.001);
-            targetRotationX = (beta / 90) * (windowHalfY * 0.001);
+            // Increased sensitivity for a more drastic response
+            const sensitivity = 2.5; 
+            targetRotationY = (gamma / 90) * sensitivity;
+            targetRotationX = (beta / 90) * sensitivity;
         }
 
         if (typeof(DeviceOrientationEvent) !== 'undefined' && typeof(DeviceOrientationEvent.requestPermission) === 'function') {
-            // iOS 13+ device
             motionButton.addEventListener('click', () => {
                 DeviceOrientationEvent.requestPermission()
                     .then(permissionState => {
@@ -304,14 +314,12 @@
                     .catch(console.error);
             });
         } else if ('DeviceOrientationEvent' in window) {
-            // Non-iOS 13+ devices that support the event
              motionButton.addEventListener('click', () => {
                 window.addEventListener('deviceorientation', handleOrientation);
                 motionControlEnabled = true;
                 motionButton.style.display = 'none';
             });
         } else {
-            // No motion support, hide the button
             motionButton.style.display = 'none';
         }
 
@@ -365,10 +373,10 @@
         }
         
         const links = [
-            { el: document.getElementById('link1'), x: 25, y: 25, speed: 0.2, amp: 2 },
-            { el: document.getElementById('link2'), x: 75, y: 25, speed: 0.25, amp: 2.5 },
-            { el: document.getElementById('link3'), x: 25, y: 75, speed: 0.15, amp: 3 },
-            { el: document.getElementById('link4'), x: 75, y: 75, speed: 0.3, amp: 2 }
+            { el: document.getElementById('link1'), x: 25, y: 25, speed: 0.2, amp: 2, depth: 0.5 },
+            { el: document.getElementById('link2'), x: 75, y: 25, speed: 0.25, amp: 2.5, depth: 1 },
+            { el: document.getElementById('link3'), x: 25, y: 75, speed: 0.15, amp: 3, depth: 1 },
+            { el: document.getElementById('link4'), x: 75, y: 75, speed: 0.3, amp: 2, depth: 0.5 }
         ];
 
         const clock = new THREE.Clock();
@@ -383,15 +391,15 @@
 
             const rotationGroup = scene;
             
-            if (motionControlEnabled) {
-                // Gyro control
-                rotationGroup.rotation.x += 0.05 * (targetRotationX - rotationGroup.rotation.x);
-                rotationGroup.rotation.y += 0.05 * (targetRotationY - rotationGroup.rotation.y);
-            } else {
-                // Default auto-rotation for desktop
+            if (!motionControlEnabled) {
+                // Default auto-rotation for desktop is now combined with mouse input
                 rotationGroup.rotation.y += delta * 0.05;
                 rotationGroup.rotation.x += delta * 0.02;
             }
+            // Both gyro and mouse now smoothly update the target rotation
+            rotationGroup.rotation.x += 0.05 * (targetRotationX - rotationGroup.rotation.x);
+            rotationGroup.rotation.y += 0.05 * (targetRotationY - rotationGroup.rotation.y);
+
 
             stars.rotation.y += delta * 0.005;
 
@@ -416,11 +424,17 @@
                 }
             });
             
+            // Animate links with parallax
             links.forEach((link, i) => {
                 const newX = link.x + Math.sin(time * link.speed + i) * link.amp;
                 const newY = link.y + Math.cos(time * link.speed * 0.7 + i) * link.amp;
                 link.el.style.left = `${newX}%`;
                 link.el.style.top = `${newY}%`;
+
+                // Parallax effect for icons
+                const parallaxX = -rotationGroup.rotation.y * 50 * link.depth;
+                const parallaxY = rotationGroup.rotation.x * 50 * link.depth;
+                link.el.style.transform = `translate(-50%, -50%) translate(${parallaxX}px, ${parallaxY}px)`;
             });
 
             composer.render();
