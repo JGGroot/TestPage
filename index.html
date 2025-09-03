@@ -3,457 +3,525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Royal Spark AI Tesseract</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;600&display=swap" rel="stylesheet">
+    <title>Warehouse Part Logger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
+            font-family: 'Inter', sans-serif;
+        }
+        .input-focus:focus {
+            box-shadow: 0 0 0 2px #3b82f6;
+            outline: none;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #27272a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #52525b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #71717a;
+        }
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        /* Hide number input spinners on all browsers */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
             margin: 0;
-            overflow: hidden;
-            background: radial-gradient(ellipse at center, #1e0a33 0%, #000000 100%);
-            color: #fff;
-            font-family: 'Exo 2', sans-serif;
         }
-        canvas {
-            display: block;
-        }
-        #title-container {
-            position: absolute;
-            top: 30px;
-            width: 100%;
-            text-align: center;
-            z-index: 10;
-        }
-        h1 {
-            margin: 0;
-            font-size: 3rem;
-            font-weight: 300;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #a855f7, #60a5fa, #34d399);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
-            animation: pulse-glow 4s infinite alternate;
-        }
-        .link-container {
-            position: absolute;
-            z-index: 10;
-            transform: translate(-50%, -50%);
-            perspective: 1000px;
-            transition: transform 0.1s linear; /* Smooth parallax effect */
-        }
-        .tool-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 160px;
-            height: 160px;
-            padding: 10px;
-            text-align: center;
-            background: rgba(17, 24, 39, 0.6);
-            border: 1px solid rgba(139, 92, 246, 0.5);
-            border-radius: 50%; /* This makes it a circle */
-            text-decoration: none;
-            color: #f9fafb;
-            font-weight: 600;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            white-space: normal; /* Allow text to wrap */
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2), inset 0 0 10px rgba(139, 92, 246, 0.3);
-        }
-        .tool-link:hover {
-            transform: scale(1.1);
-            background: rgba(139, 92, 246, 0.4);
-            border-color: #a855f7;
-            box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
-            text-shadow: 0 0 10px #fff;
-        }
-        
-        #motion-control-container {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            z-index: 20;
-        }
-        #motion-control-button {
-            background: rgba(139, 92, 246, 0.4);
-            border: 1px solid #a855f7;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Exo 2', sans-serif;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        #motion-control-button:hover {
-            background: rgba(139, 92, 246, 0.7);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
-        }
-
-        @keyframes pulse-glow {
-            from { text-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
-            to { text-shadow: 0 0 35px rgba(96, 165, 250, 0.6); }
-        }
-
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-            .tool-link {
-                width: 120px;
-                height: 120px;
-                font-size: 0.9rem;
-            }
+        input[type=number] {
+            -moz-appearance: textfield;
         }
     </style>
 </head>
-<body>
-    <div id="title-container">
-        <h1>AI Tesseract</h1>
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Name Input Modal -->
+    <div id="name-modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-sm text-center">
+            <form id="name-form">
+                <h2 class="text-2xl font-bold text-white mb-4">Enter Your Name</h2>
+                <p class="text-gray-400 mb-6">Please enter your name to start logging.</p>
+                <input type="text" id="name-input" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus transition duration-200 mb-6" placeholder="Your Name">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-md">
+                    Start Logging
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Edit Entry Modal -->
+    <div id="edit-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-lg text-left">
+            <h2 class="text-2xl font-bold text-white mb-6">Edit Log Entry</h2>
+            <form id="edit-form">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-asset-id" class="block text-sm font-medium text-gray-300 mb-1">Asset ID</label>
+                        <input type="text" id="edit-asset-id" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white input-focus">
+                    </div>
+                    <div>
+                        <label for="edit-storage-location" class="block text-sm font-medium text-gray-300 mb-1">Storage Location</label>
+                        <input type="text" id="edit-storage-location" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white input-focus">
+                    </div>
+                    <div>
+                        <label for="edit-quantity-added" class="block text-sm font-medium text-gray-300 mb-1">Quantity Added</label>
+                        <input type="number" id="edit-quantity-added" required min="1" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white input-focus numpad-trigger">
+                    </div>
+                    <div>
+                        <label for="edit-total-quantity" class="block text-sm font-medium text-gray-300 mb-1">New Total Quantity</label>
+                        <input type="number" id="edit-total-quantity" required min="0" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white input-focus numpad-trigger">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-4 mt-8">
+                    <button type="button" id="edit-cancel" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Clear Log Confirmation Modal -->
+    <div id="clear-log-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
+            <h3 class="text-lg font-bold text-white mb-4">Clear All Log Entries?</h3>
+            <p class="text-gray-300 mb-4">This is irreversible. To confirm, please type <strong class="text-red-400">CLEAR</strong> in the box below.</p>
+            <input type="text" id="clear-confirm-input" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus transition duration-200 mb-4" placeholder="Type CLEAR to confirm">
+            <div class="flex justify-center gap-4">
+                <button id="clear-log-confirm" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 opacity-50 cursor-not-allowed" disabled>Confirm</button>
+                <button id="clear-log-cancel" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Numpad Modal -->
+    <div id="numpad-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-end justify-center hidden z-50 sm:hidden">
+        <div class="bg-gray-800 w-full rounded-t-2xl shadow-xl p-4 flex flex-col">
+             <div id="numpad-display" class="bg-gray-900 text-white text-4xl text-right rounded-lg px-4 py-3 mb-4 font-mono">0</div>
+             <div id="numpad-buttons" class="grid grid-cols-4 gap-2">
+                 <button data-key="1" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">1</button>
+                 <button data-key="2" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">2</button>
+                 <button data-key="3" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">3</button>
+                 <button data-key="backspace" class="text-2xl bg-gray-700/80 hover:bg-gray-600 rounded-lg p-4 transition duration-200 flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 002.828 0L21 12M3 12l6.414-6.414a2 2 0 012.828 0L21 12" /></svg>
+                 </button>
+                 <button data-key="4" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">4</button>
+                 <button data-key="5" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">5</button>
+                 <button data-key="6" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">6</button>
+                 <button id="numpad-cancel" class="text-xl bg-red-600/80 hover:bg-red-500 rounded-lg p-4 transition duration-200 font-bold">Cancel</button>
+                 <button data-key="7" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">7</button>
+                 <button data-key="8" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">8</button>
+                 <button data-key="9" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">9</button>
+                 <button id="numpad-done" class="row-span-2 text-xl bg-green-600 hover:bg-green-500 rounded-lg p-4 transition duration-200 font-bold">Done</button>
+                 <button data-key="0" class="col-span-3 numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">0</button>
+             </div>
+        </div>
     </div>
 
-    <!-- Links to your AI Tools -->
-    <div id="link1" class="link-container">
-        <a href="#" class="tool-link" onclick="loadTool('Acquisition Compass.html')">Acquisition Compass</a>
+
+    <div class="w-full max-w-6xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-white">Warehouse Part Logger</h1>
+            <p class="text-gray-400 mt-2">Scan asset and location barcodes to log inventory updates.</p>
+            <p id="user-display" class="text-gray-400 mt-2 text-sm"></p>
+        </header>
+
+        <!-- Main Form for Logging -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
+            <form id="log-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                <div class="md:col-span-1">
+                    <label for="asset-id" class="block text-sm font-medium text-gray-300 mb-1">Asset ID</label>
+                    <input type="text" id="asset-id" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus transition duration-200" placeholder="Scan Part Barcode">
+                </div>
+                <div class="md-col-span-1">
+                    <label for="storage-location" class="block text-sm font-medium text-gray-300 mb-1">Storage Location</label>
+                    <input type="text" id="storage-location" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus transition duration-200" placeholder="Scan Location Barcode">
+                </div>
+                <div>
+                    <label for="quantity-added" class="block text-sm font-medium text-gray-300 mb-1">Quantity Added</label>
+                    <input type="number" id="quantity-added" required min="1" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus numpad-trigger" placeholder="e.g., 5">
+                </div>
+                <div>
+                    <label for="total-quantity" class="block text-sm font-medium text-gray-300 mb-1">New Total Quantity</label>
+                    <input type="number" id="total-quantity" required min="0" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus numpad-trigger" placeholder="e.g., 25">
+                </div>
+                <button type="submit" class="md:col-span-2 lg:col-span-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-md mt-4">
+                    Add Log Entry
+                </button>
+            </form>
+        </div>
+
+        <!-- Log Display and Controls -->
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-white mb-4 sm:mb-0">Log Entries</h2>
+                <div class="flex gap-2">
+                    <button id="export-csv" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Export to CSV</button>
+                    <button id="clear-log" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Clear Log</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto max-h-96 rounded-lg border border-gray-700">
+                <table class="min-w-full divide-y divide-gray-700">
+                    <thead class="bg-gray-700 sticky top-0">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Asset ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Storage Location</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Qty Added</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">New Total</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Logged By</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Timestamp</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body" class="bg-gray-800 divide-y divide-gray-700">
+                         <tr id="placeholder-row">
+                            <td colspan="7" class="px-6 py-10 text-center text-gray-400">No entries yet. Scan an item to begin.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div id="link2" class="link-container">
-        <a href="#" class="tool-link" onclick="loadTool('Agenda AI (1).html')">Agenda AI</a>
+    
+    <!-- Custom Modal for Confirmation -->
+    <div id="confirmation-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
+            <h3 class="text-lg font-bold text-white mb-4" id="modal-title">Are you sure?</h3>
+            <p class="text-gray-300 mb-6" id="modal-message">This action cannot be undone.</p>
+            <div class="flex justify-center gap-4">
+                <button id="modal-confirm" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Confirm</button>
+                <button id="modal-cancel" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Cancel</button>
+            </div>
+        </div>
     </div>
-    <div id="link3" class="link-container">
-        <a href="#" class="tool-link" onclick="loadTool('SparkLens.html')">SparkLens</a>
-    </div>
-    <div id="link4" class="link-container">
-        <a href="#" class="tool-link" onclick="loadTool('mmc generator.html')">MMC Generator</a>
-    </div>
-
-    <div id="motion-control-container">
-        <button id="motion-control-button">Enable Motion Control</button>
-    </div>
-
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
-            }
-        }
-    </script>
-    <script type="module">
-        import * as THREE from 'three';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-
-        // --- Basic Three.js Setup ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        document.body.appendChild(renderer.domElement);
-
-        camera.position.z = 8;
-
-        // --- Post-processing for Glow Effect ---
-        const renderScene = new RenderPass(scene, camera);
-        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-        bloomPass.threshold = 0;
-        bloomPass.strength = 1.8;
-        bloomPass.radius = 0.6;
-
-        const composer = new EffectComposer(renderer);
-        composer.addPass(renderScene);
-        composer.addPass(bloomPass);
-
-        // --- Starfield Particle System ---
-        const starVertices = [];
-        const starColors = [];
-        const starColorTypes = [
-            new THREE.Color(0xffffff), // White
-            new THREE.Color(0xaad8ff), // Light Blue
-            new THREE.Color(0xffc0a0)  // Red-Orange
-        ];
-        for (let i = 0; i < 15000; i++) {
-            const x = THREE.MathUtils.randFloatSpread(300);
-            const y = THREE.MathUtils.randFloatSpread(300);
-            const z = THREE.MathUtils.randFloatSpread(300);
-            starVertices.push(x, y, z);
-            const color = starColorTypes[Math.floor(Math.random() * starColorTypes.length)];
-            starColors.push(color.r, color.g, color.b);
-        }
-        const starGeometry = new THREE.BufferGeometry();
-        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-        starGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3));
-        const starMaterial = new THREE.PointsMaterial({ size: 0.1, vertexColors: true });
-        const stars = new THREE.Points(starGeometry, starMaterial);
-        scene.add(stars);
-        
-        // --- Meteors ---
-        const meteorGeometry = new THREE.BufferGeometry();
-        const meteorVertices = [];
-        for (let i = 0; i < 20; i++) {
-            meteorVertices.push(
-                THREE.MathUtils.randFloatSpread(500),
-                THREE.MathUtils.randFloat(300, 400),
-                THREE.MathUtils.randFloat(-300, -100)
-            );
-        }
-        meteorGeometry.setAttribute('position', new THREE.Float32BufferAttribute(meteorVertices, 3));
-        const meteorMaterial = new THREE.PointsMaterial({
-            color: 0xffffff, size: 0.3, transparent: true,
-            blending: THREE.AdditiveBlending, depthWrite: false
-        });
-        const meteors = new THREE.Points(meteorGeometry, meteorMaterial);
-        scene.add(meteors);
-
-        // --- Spaceships ---
-        const spaceships = new THREE.Group();
-        const shipGeometry = new THREE.ConeGeometry(0.05, 0.25, 8);
-        const shipMaterial = new THREE.MeshBasicMaterial({ color: 0x9ca3af });
-        for (let i = 0; i < 15; i++) {
-            const ship = new THREE.Mesh(shipGeometry, shipMaterial);
-            ship.position.set(
-                THREE.MathUtils.randFloatSpread(80),
-                THREE.MathUtils.randFloatSpread(80),
-                THREE.MathUtils.randFloatSpread(40) - 40
-            );
-            ship.rotation.x = Math.PI / 2;
-            ship.velocity = new THREE.Vector3(0, 0, THREE.MathUtils.randFloat(0.05, 0.15));
-            spaceships.add(ship);
-        }
-        scene.add(spaceships);
 
 
-        // --- Tesseract Geometry ---
-        const points4D = [];
-        for (let i = 0; i < 16; i++) {
-            points4D.push(new THREE.Vector4(
-                (i & 1) ? -1 : 1, (i & 2) ? -1 : 1,
-                (i & 4) ? -1 : 1, (i & 8) ? -1 : 1
-            ));
-        }
-        const edges = [
-            0, 1, 0, 2, 0, 4, 0, 8, 1, 3, 1, 5, 1, 9, 2, 3, 2, 6, 2, 10,
-            3, 7, 3, 11, 4, 5, 4, 6, 4, 12, 5, 7, 5, 13, 6, 7, 6, 14,
-            7, 15, 8, 9, 8, 10, 8, 12, 9, 11, 9, 13, 10, 11, 10, 14,
-            11, 15, 12, 13, 12, 14, 13, 15, 14, 15
-        ];
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const getEl = (id) => document.getElementById(id);
+            
+            // --- DOM Elements ---
+            const logForm = getEl('log-form');
+            const assetIdInput = getEl('asset-id');
+            const storageLocationInput = getEl('storage-location');
+            const quantityAddedInput = getEl('quantity-added');
+            const totalQuantityInput = getEl('total-quantity');
+            const logTableBody = getEl('log-table-body');
+            const exportBtn = getEl('export-csv');
+            const clearBtn = getEl('clear-log');
+            const placeholderRow = getEl('placeholder-row');
+            
+            const nameModal = getEl('name-modal');
+            const nameForm = getEl('name-form');
+            const nameInput = getEl('name-input');
+            const userDisplay = getEl('user-display');
 
-        // --- Create Tesseracts ---
-        function createTesseract(color, scale, linewidth) {
-            const material = new THREE.LineBasicMaterial({ color: color, linewidth: linewidth });
-            const tesseractGroup = new THREE.Group();
-            tesseractGroup.scale.set(scale, scale, scale);
-            tesseractGroup.children.material = material; 
-            scene.add(tesseractGroup);
-            return tesseractGroup;
-        }
+            const confirmationModal = getEl('confirmation-modal');
+            const modalConfirmBtn = getEl('modal-confirm');
+            const modalCancelBtn = getEl('modal-cancel');
 
-        const tesseract1 = createTesseract(0xa855f7, 2.5, 2);
-        const tesseract2 = createTesseract(0x3b82f6, 2.8, 1);
-        
-        // --- Glowing Vertex Particles ---
-        const particleTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/sprites/spark1.png');
-        const particleMaterial = new THREE.PointsMaterial({
-            color: 0xffffff, size: 0.4, map: particleTexture,
-            blending: THREE.AdditiveBlending, transparent: true, depthWrite: false
-        });
-        const particleGeometry = new THREE.BufferGeometry();
-        const particlePositions = new Float32Array(16 * 3);
-        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-        const vertexParticles = new THREE.Points(particleGeometry, particleMaterial);
-        tesseract1.add(vertexParticles);
+            const editModal = getEl('edit-modal');
+            const editForm = getEl('edit-form');
+            const editAssetIdInput = getEl('edit-asset-id');
+            const editStorageLocationInput = getEl('edit-storage-location');
+            const editQuantityAddedInput = getEl('edit-quantity-added');
+            const editTotalQuantityInput = getEl('edit-total-quantity');
+            const editCancelBtn = getEl('edit-cancel');
 
-        // --- Input Controls (Mouse, Gyro, and fallback rotation) ---
-        let mouseX = 0, mouseY = 0;
-        let targetRotationX = 0, targetRotationY = 0;
-        let motionControlEnabled = false;
+            const clearLogModal = getEl('clear-log-modal');
+            const clearConfirmInput = getEl('clear-confirm-input');
+            const clearLogConfirmBtn = getEl('clear-log-confirm');
+            const clearLogCancelBtn = getEl('clear-log-cancel');
 
-        // Mouse Listener
-        document.addEventListener('mousemove', (event) => {
-            if (!motionControlEnabled) {
-                const windowHalfX = window.innerWidth / 2;
-                const windowHalfY = window.innerHeight / 2;
-                mouseX = (event.clientX - windowHalfX);
-                mouseY = (event.clientY - windowHalfY);
-                // Update target rotation directly from mouse
-                targetRotationY = mouseX * 0.0005;
-                targetRotationX = mouseY * 0.0005;
-            }
-        }, false);
+            // Numpad Modal elements
+            const numpadModal = getEl('numpad-modal');
+            const numpadDisplay = getEl('numpad-display');
+            const numpadButtons = getEl('numpad-buttons');
+            const numpadCancelBtn = getEl('numpad-cancel');
+            const numpadDoneBtn = getEl('numpad-done');
 
-        // Gyro Listener Setup
-        const motionButton = document.getElementById('motion-control-button');
-        
-        function handleOrientation(event) {
-            const beta = Math.max(-90, Math.min(90, event.beta));
-            const gamma = Math.max(-90, Math.min(90, event.gamma));
 
-            // Increased sensitivity for a more drastic response
-            const sensitivity = 2.5; 
-            targetRotationY = (gamma / 90) * sensitivity;
-            targetRotationX = (beta / 90) * sensitivity;
-        }
+            // --- STATE ---
+            let logEntries = JSON.parse(localStorage.getItem('warehouseLogEntries')) || [];
+            let currentUser = '';
+            let currentlyEditingIndex = null;
+            let activeNumpadInput = null;
 
-        if (typeof(DeviceOrientationEvent) !== 'undefined' && typeof(DeviceOrientationEvent.requestPermission) === 'function') {
-            motionButton.addEventListener('click', () => {
-                DeviceOrientationEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation);
-                            motionControlEnabled = true;
-                            motionButton.style.display = 'none';
+            // --- HELPERS ---
+            const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
+
+            // --- USER NAME MANAGEMENT ---
+            const setupUser = () => {
+                currentUser = localStorage.getItem('warehouseCurrentUser');
+                if (!currentUser) {
+                    nameModal.classList.remove('hidden');
+                    nameInput.focus();
+                } else {
+                    updateUserDisplay();
+                }
+            };
+            
+            const updateUserDisplay = () => {
+                userDisplay.innerHTML = `Logged in as: <strong class="text-white">${currentUser}</strong> <button id="change-user-btn" class="text-blue-400 hover:underline ml-2 font-semibold">Change</button>`;
+                getEl('change-user-btn').addEventListener('click', () => {
+                     nameModal.classList.remove('hidden');
+                     nameInput.focus();
+                });
+            };
+            
+            nameForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const enteredName = nameInput.value.trim();
+                if (enteredName) {
+                    currentUser = enteredName;
+                    localStorage.setItem('warehouseCurrentUser', currentUser);
+                    updateUserDisplay();
+                    nameModal.classList.add('hidden');
+                    assetIdInput.focus();
+                }
+            });
+
+            // --- LOCAL STORAGE & RENDER ---
+            const saveAndRender = () => {
+                localStorage.setItem('warehouseLogEntries', JSON.stringify(logEntries));
+                renderTable();
+            };
+            
+            const renderTable = () => {
+                logTableBody.innerHTML = '';
+                if (logEntries.length === 0) {
+                   logTableBody.appendChild(placeholderRow);
+                } else {
+                    logEntries.forEach((entry, index) => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-700/50 transition-colors duration-200';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${entry.assetId}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.storageLocation}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.quantityAdded}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.totalQuantity}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.userName}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.timestamp}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
+                                <button class="edit-btn text-blue-400 hover:text-blue-300" data-index="${index}">Edit</button>
+                                <button class="delete-btn text-red-400 hover:text-red-300 ml-4" data-index="${index}">Delete</button>
+                            </td>
+                        `;
+                        logTableBody.appendChild(row);
+                    });
+                }
+            };
+            
+            // --- MODAL LOGIC ---
+            let confirmCallback = null;
+            const showConfirmationModal = (message, onConfirm) => {
+                getEl('modal-message').textContent = message;
+                confirmCallback = onConfirm;
+                confirmationModal.classList.remove('hidden');
+            };
+
+            const hideConfirmationModal = () => {
+                confirmationModal.classList.add('hidden');
+                confirmCallback = null;
+            };
+
+            modalConfirmBtn.addEventListener('click', () => {
+                if(confirmCallback) confirmCallback();
+                hideConfirmationModal();
+            });
+
+            modalCancelBtn.addEventListener('click', hideConfirmationModal);
+
+            // --- NUMPAD LOGIC ---
+            const showNumpad = (initialValue) => {
+                numpadDisplay.textContent = initialValue || '0';
+                numpadModal.classList.remove('hidden');
+            };
+
+            const hideNumpad = () => {
+                numpadModal.classList.add('hidden');
+                activeNumpadInput = null;
+            };
+
+            const setupNumpadTriggers = () => {
+                document.querySelectorAll('.numpad-trigger').forEach(input => {
+                    const handleFocus = (e) => {
+                        if (isMobile()) {
+                            e.preventDefault();
+                            document.activeElement.blur(); // Prevent keyboard
+                            activeNumpadInput = e.target;
+                            showNumpad(e.target.value);
                         }
-                    })
-                    .catch(console.error);
-            });
-        } else if ('DeviceOrientationEvent' in window) {
-             motionButton.addEventListener('click', () => {
-                window.addEventListener('deviceorientation', handleOrientation);
-                motionControlEnabled = true;
-                motionButton.style.display = 'none';
-            });
-        } else {
-            motionButton.style.display = 'none';
-        }
+                    };
+                    input.removeEventListener('focus', handleFocus); // Prevent multiple listeners
+                    input.addEventListener('focus', handleFocus);
+                });
+            };
 
+            numpadButtons.addEventListener('click', (e) => {
+                const button = e.target.closest('button');
+                if (!button) return;
+                const key = button.dataset.key;
+                if (!key) return;
 
-        // --- Animation Loop ---
-        function projectAndDraw(tesseractGroup, angle4D) {
-            const projectedPoints3D = [];
-            points4D.forEach(p4 => {
-                const p = p4.clone();
-                const rotationXY = angle4D;
-                const rotationZW = angle4D * 0.4;
-                
-                let x = p.x * Math.cos(rotationXY) - p.y * Math.sin(rotationXY);
-                let y = p.x * Math.sin(rotationXY) + p.y * Math.cos(rotationXY);
-                p.x = x; p.y = y;
-                
-                let z = p.z * Math.cos(rotationZW) - p.w * Math.sin(rotationZW);
-                let w = p.z * Math.sin(rotationZW) + p.w * Math.cos(rotationZW);
-                p.z = z; p.w = w;
-
-                const distance = 4;
-                const w_proj = 1 / (distance - p.w);
-                projectedPoints3D.push(new THREE.Vector3(p.x * w_proj, p.y * w_proj, p.z * w_proj));
-            });
-
-            const lines = tesseractGroup.children.filter(c => c.isLine);
-            if (lines.length === 0) {
-                 for (let i = 0; i < edges.length; i += 2) {
-                    const geometry = new THREE.BufferGeometry();
-                    const line = new THREE.Line(geometry, tesseractGroup.children.material);
-                    tesseractGroup.add(line);
+                let currentValue = numpadDisplay.textContent;
+                if (key === 'backspace') {
+                    numpadDisplay.textContent = currentValue.length > 1 ? currentValue.slice(0, -1) : '0';
+                } else if (/\d/.test(key)) {
+                    numpadDisplay.textContent = currentValue === '0' ? key : currentValue + key;
                 }
-            }
+            });
+
+            numpadDoneBtn.addEventListener('click', () => {
+                if (activeNumpadInput) {
+                    activeNumpadInput.value = numpadDisplay.textContent;
+                }
+                hideNumpad();
+            });
+
+            numpadCancelBtn.addEventListener('click', hideNumpad);
+
+            // --- EVENT LISTENERS ---
+            logForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!currentUser) {
+                    nameModal.classList.remove('hidden');
+                    nameInput.focus();
+                    return;
+                }
+                const newEntry = {
+                    assetId: assetIdInput.value.trim(),
+                    storageLocation: storageLocationInput.value.trim(),
+                    quantityAdded: quantityAddedInput.value,
+                    totalQuantity: totalQuantityInput.value,
+                    userName: currentUser,
+                    timestamp: new Date().toLocaleString()
+                };
+                logEntries.unshift(newEntry);
+                saveAndRender();
+                logForm.reset();
+                assetIdInput.focus();
+            });
+
+            logTableBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-btn')) {
+                    const index = e.target.dataset.index;
+                    showConfirmationModal(`Are you sure you want to delete the entry for asset "${logEntries[index].assetId}"?`, () => {
+                        logEntries.splice(index, 1);
+                        saveAndRender();
+                    });
+                }
+                if (e.target.classList.contains('edit-btn')) {
+                    currentlyEditingIndex = e.target.dataset.index;
+                    const entry = logEntries[currentlyEditingIndex];
+                    editAssetIdInput.value = entry.assetId;
+                    editStorageLocationInput.value = entry.storageLocation;
+                    editQuantityAddedInput.value = entry.quantityAdded;
+                    editTotalQuantityInput.value = entry.totalQuantity;
+                    editModal.classList.remove('hidden');
+                    setupNumpadTriggers(); // Re-init for edit modal inputs
+                }
+            });
+
+            editForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const updatedEntry = {
+                    ...logEntries[currentlyEditingIndex],
+                    assetId: editAssetIdInput.value.trim(),
+                    storageLocation: editStorageLocationInput.value.trim(),
+                    quantityAdded: editQuantityAddedInput.value,
+                    totalQuantity: editTotalQuantityInput.value,
+                };
+                logEntries[currentlyEditingIndex] = updatedEntry;
+                saveAndRender();
+                editModal.classList.add('hidden');
+                currentlyEditingIndex = null;
+            });
+
+            editCancelBtn.addEventListener('click', () => {
+                editModal.classList.add('hidden');
+                currentlyEditingIndex = null;
+            });
+
+            exportBtn.addEventListener('click', () => {
+                if (logEntries.length === 0) {
+                    showConfirmationModal("Log is empty. Nothing to export.", () => {});
+                    getEl('modal-title').textContent = "Info";
+                    modalConfirmBtn.style.display = 'none';
+                    modalCancelBtn.textContent = 'Close';
+
+                    const observer = new MutationObserver(() => {
+                         if (confirmationModal.classList.contains('hidden')) {
+                             getEl('modal-title').textContent = "Are you sure?";
+                             modalConfirmBtn.style.display = 'inline-flex';
+                             modalCancelBtn.textContent = 'Cancel';
+                             observer.disconnect();
+                         }
+                     });
+                     observer.observe(confirmationModal, { attributes: true, attributeFilter: ['class'] });
+                    return;
+                }
+                const headers = ['Asset ID', 'Storage Location', 'Quantity Added', 'Total Quantity', 'Logged By', 'Timestamp'];
+                const csvContent = [
+                    headers.join(','),
+                    ...logEntries.map(e => [
+                        `"${e.assetId}"`, `"${e.storageLocation}"`, e.quantityAdded, e.totalQuantity, `"${e.userName}"`, `"${e.timestamp}"`
+                    ].join(','))
+                ].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `warehouse_log_${new Date().toISOString().slice(0, 10)}.csv`;
+                link.click();
+            });
             
-            tesseractGroup.children.filter(c => c.isLine).forEach((line, i) => {
-                 line.geometry.setFromPoints([
-                    projectedPoints3D[edges[i*2]],
-                    projectedPoints3D[edges[i*2 + 1]]
-                ]);
+            clearBtn.addEventListener('click', () => {
+                if (logEntries.length === 0) return;
+                clearLogModal.classList.remove('hidden');
+                clearConfirmInput.focus();
             });
 
-            if (tesseractGroup === tesseract1) {
-                const positions = vertexParticles.geometry.attributes.position.array;
-                for (let i = 0; i < 16; i++) {
-                    positions[i * 3] = projectedPoints3D[i].x;
-                    positions[i * 3 + 1] = projectedPoints3D[i].y;
-                    positions[i * 3 + 2] = projectedPoints3D[i].z;
-                }
-                vertexParticles.geometry.attributes.position.needsUpdate = true;
-            }
-        }
-        
-        const links = [
-            { el: document.getElementById('link1'), x: 25, y: 25, speed: 0.2, amp: 2, depth: 0.5 },
-            { el: document.getElementById('link2'), x: 75, y: 25, speed: 0.25, amp: 2.5, depth: 1 },
-            { el: document.getElementById('link3'), x: 25, y: 75, speed: 0.15, amp: 3, depth: 1 },
-            { el: document.getElementById('link4'), x: 75, y: 75, speed: 0.3, amp: 2, depth: 0.5 }
-        ];
-
-        const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const delta = clock.getDelta();
-            const time = clock.getElapsedTime();
-
-            projectAndDraw(tesseract1, time * 0.5);
-            projectAndDraw(tesseract2, time * 0.3);
-
-            const rotationGroup = scene;
-            
-            if (!motionControlEnabled) {
-                // Default auto-rotation for desktop is now combined with mouse input
-                rotationGroup.rotation.y += delta * 0.05;
-                rotationGroup.rotation.x += delta * 0.02;
-            }
-            // Both gyro and mouse now smoothly update the target rotation
-            rotationGroup.rotation.x += 0.05 * (targetRotationX - rotationGroup.rotation.x);
-            rotationGroup.rotation.y += 0.05 * (targetRotationY - rotationGroup.rotation.y);
-
-
-            stars.rotation.y += delta * 0.005;
-
-            // Animate Meteors
-            meteorGeometry.attributes.position.array.forEach((val, i) => {
-                if (i % 3 === 1) { // y-coordinate
-                    meteorGeometry.attributes.position.array[i] -= 2;
-                    if (meteorGeometry.attributes.position.array[i] < -200) {
-                        meteorGeometry.attributes.position.array[i] = 200;
-                    }
+            clearConfirmInput.addEventListener('input', () => {
+                if (clearConfirmInput.value === 'CLEAR') {
+                    clearLogConfirmBtn.disabled = false;
+                    clearLogConfirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    clearLogConfirmBtn.disabled = true;
+                    clearLogConfirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 }
             });
-            meteorGeometry.attributes.position.needsUpdate = true;
 
-            // Animate Spaceships
-            spaceships.children.forEach(ship => {
-                ship.position.add(ship.velocity);
-                if (ship.position.z > 50) {
-                    ship.position.z = -50;
-                    ship.position.x = THREE.MathUtils.randFloatSpread(80);
-                    ship.position.y = THREE.MathUtils.randFloatSpread(80);
-                }
+            clearLogConfirmBtn.addEventListener('click', () => {
+                logEntries = [];
+                saveAndRender();
+                clearLogModal.classList.add('hidden');
+                clearConfirmInput.value = '';
+                clearLogConfirmBtn.disabled = true;
+                clearLogConfirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+
+            clearLogCancelBtn.addEventListener('click', () => {
+                clearLogModal.classList.add('hidden');
+                clearConfirmInput.value = '';
+                 clearLogConfirmBtn.disabled = true;
+                clearLogConfirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
             });
             
-            // Animate links with parallax
-            links.forEach((link, i) => {
-                const newX = link.x + Math.sin(time * link.speed + i) * link.amp;
-                const newY = link.y + Math.cos(time * link.speed * 0.7 + i) * link.amp;
-                link.el.style.left = `${newX}%`;
-                link.el.style.top = `${newY}%`;
-
-                // Parallax effect for icons
-                const parallaxX = -rotationGroup.rotation.y * 50 * link.depth;
-                const parallaxY = rotationGroup.rotation.x * 50 * link.depth;
-                link.el.style.transform = `translate(-50%, -50%) translate(${parallaxX}px, ${parallaxY}px)`;
-            });
-
-            composer.render();
-        }
-
-        // --- Window Resize ---
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
-        }, false);
-        
-        // --- Link Loading Function ---
-        window.loadTool = function(toolName) {
-            alert(`Loading tool: ${toolName}`);
-        }
-
-        animate();
+            // --- INITIALIZATION ---
+            setupUser();
+            renderTable();
+            setupNumpadTriggers();
+        });
     </script>
 </body>
 </html>
+
+
