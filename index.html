@@ -9,11 +9,11 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Disable tap highlight on mobile */
+            -webkit-tap-highlight-color: transparent;
         }
         .calendar-table {
             border-collapse: separate;
-            border-spacing: 0.25rem; /* space between cells */
+            border-spacing: 0.25rem;
         }
         .calendar-day {
             transition: all 0.2s ease-in-out;
@@ -29,9 +29,21 @@
             border-radius: 9999px;
             box-shadow: 0 0 15px rgba(5, 150, 105, 0.5);
         }
+        .calendar-day.unavailable {
+            background-color: #dc2626; /* red-600 */
+            color: white;
+            font-weight: 600;
+            transform: scale(1.05);
+            border-radius: 9999px;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+        }
         .calendar-day.past {
             color: #475569; /* slate-600 */
             pointer-events: none;
+        }
+        .tab-btn.active {
+            background-color: #1e293b; /* slate-800 */
+            color: #f1f5f9; /* slate-100 */
         }
     </style>
 </head>
@@ -47,7 +59,13 @@
                 </svg>
             </div>
             <h1 class="text-2xl font-semibold text-slate-100 text-center">Pilot Availability</h1>
-            <p class="text-center text-slate-400 mt-1">Select your available flight days.</p>
+            <p class="text-center text-slate-400 mt-1">Select your available or unavailable flight days.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-slate-700 rounded-lg p-1 flex space-x-1">
+            <button id="available-tab" class="tab-btn w-1/2 p-2 rounded-md text-sm font-medium text-slate-300 transition active">Available</button>
+            <button id="unavailable-tab" class="tab-btn w-1/2 p-2 rounded-md text-sm font-medium text-slate-300 transition">Unavailable</button>
         </div>
 
         <!-- Calendars Container -->
@@ -65,40 +83,62 @@
         document.addEventListener('DOMContentLoaded', function() {
             const calendarsContainer = document.getElementById('calendars-container');
             const submitBtn = document.getElementById('submit-btn');
+            const availableTab = document.getElementById('available-tab');
+            const unavailableTab = document.getElementById('unavailable-tab');
 
-            // Use a Set for efficient add/delete of selected dates
+            let activeTab = 'available'; // 'available' or 'unavailable'
             const selectedDates = new Set();
+            const unavailableDates = new Set();
             
-            // --- Date and Time Configuration ---
-            // Use the actual current date for the user.
             const today = new Date();
-            // Set time to 0 to ensure whole-day comparisons work correctly
             today.setHours(0, 0, 0, 0); 
             const currentYear = today.getFullYear();
             const currentMonth = today.getMonth();
 
-            /**
-             * Generates and appends a calendar for a given month and year.
-             * @param {number} year - The full year (e.g., 2025)
-             * @param {number} month - The month, 0-indexed (e.g., 9 for October)
-             */
+            function updateTabStyles() {
+                if (activeTab === 'available') {
+                    availableTab.classList.add('active');
+                    unavailableTab.classList.remove('active');
+                } else {
+                    unavailableTab.classList.add('active');
+                    availableTab.classList.remove('active');
+                }
+                renderSelections();
+            }
+
+            function renderSelections() {
+                document.querySelectorAll('.calendar-day.selectable').forEach(cell => {
+                    const date = cell.dataset.date;
+                    cell.classList.remove('selected', 'unavailable');
+                    if (selectedDates.has(date)) {
+                        cell.classList.add('selected');
+                    }
+                    if (unavailableDates.has(date)) {
+                        cell.classList.add('unavailable');
+                    }
+                });
+            }
+
+            availableTab.addEventListener('click', () => {
+                activeTab = 'available';
+                updateTabStyles();
+            });
+
+            unavailableTab.addEventListener('click', () => {
+                activeTab = 'unavailable';
+                updateTabStyles();
+            });
+
             function createCalendar(year, month) {
                 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
                 const daysOfWeek = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-
                 const calendarWrapper = document.createElement('div');
-                
-                // --- Calendar Header ---
                 const header = document.createElement('h2');
                 header.className = 'text-lg font-semibold text-center text-slate-200';
                 header.textContent = `${monthNames[month]} ${year}`;
                 calendarWrapper.appendChild(header);
-
-                // --- Calendar Table ---
                 const table = document.createElement('table');
                 table.className = 'w-full calendar-table mt-2';
-                
-                // --- Day of Week Headers ---
                 const thead = document.createElement('thead');
                 const headerRow = document.createElement('tr');
                 daysOfWeek.forEach(day => {
@@ -109,100 +149,90 @@
                 });
                 thead.appendChild(headerRow);
                 table.appendChild(thead);
-
-                // --- Calendar Body (Days) ---
                 const tbody = document.createElement('tbody');
-                const firstDay = new Date(year, month, 1).getDay(); // Day of week for the 1st
+                const firstDay = new Date(year, month, 1).getDay();
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
-
                 let date = 1;
-                for (let i = 0; i < 6; i++) { // Max 6 rows for a month
+                for (let i = 0; i < 6; i++) {
                     const row = document.createElement('tr');
                     for (let j = 0; j < 7; j++) {
                         const cell = document.createElement('td');
                         cell.className = 'calendar-day text-center w-10 h-10 p-1 cursor-pointer rounded-full';
-
                         if (i === 0 && j < firstDay) {
-                            // Empty cells before the 1st day of the month
                             cell.classList.remove('cursor-pointer');
                         } else if (date > daysInMonth) {
-                            // Stop after the last day of the month
                             cell.classList.remove('cursor-pointer');
                         } else {
-                            // --- Fill in the date ---
                             const currentDate = new Date(year, month, date);
                             cell.textContent = date;
-                            
-                            // Check if the date is in the past
                             if (currentDate < today) {
                                 cell.classList.add('past');
                                 cell.classList.remove('cursor-pointer');
                             } else {
                                 cell.classList.add('selectable');
                                 const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
-                                cell.dataset.date = dateString; // Store date in YYYY-MM-DD format
+                                cell.dataset.date = dateString;
                             }
                             date++;
                         }
                         row.appendChild(cell);
                     }
                     tbody.appendChild(row);
-                    if (date > daysInMonth) break; // Exit loop if all dates are rendered
+                    if (date > daysInMonth) break;
                 }
                 table.appendChild(tbody);
                 calendarWrapper.appendChild(table);
                 calendarsContainer.appendChild(calendarWrapper);
             }
 
-            // --- Event Handling ---
             calendarsContainer.addEventListener('click', function(e) {
                 const target = e.target;
                 if (target.classList.contains('selectable') && !target.classList.contains('past')) {
                     const date = target.dataset.date;
-                    target.classList.toggle('selected');
-                    if (selectedDates.has(date)) {
-                        selectedDates.delete(date);
-                    } else {
-                        selectedDates.add(date);
+                    if (activeTab === 'available') {
+                        unavailableDates.delete(date); // A day can't be both
+                        if (selectedDates.has(date)) {
+                            selectedDates.delete(date);
+                        } else {
+                            selectedDates.add(date);
+                        }
+                    } else { // activeTab is 'unavailable'
+                        selectedDates.delete(date); // A day can't be both
+                        if (unavailableDates.has(date)) {
+                            unavailableDates.delete(date);
+                        } else {
+                            unavailableDates.add(date);
+                        }
                     }
+                    renderSelections();
                 }
             });
 
             submitBtn.addEventListener('click', function() {
-                if (selectedDates.size === 0) {
-                    // Replaced alert with a more modern, non-blocking notification.
+                const datesToSubmit = activeTab === 'available' ? selectedDates : unavailableDates;
+                const subjectType = activeTab === 'available' ? 'Availability' : 'Unavailability';
+                const jsonKey = activeTab === 'available' ? 'availableDates' : 'unavailableDates';
+
+                if (datesToSubmit.size === 0) {
                     const originalText = submitBtn.textContent;
                     submitBtn.textContent = 'Please select a date first!';
-                    submitBtn.classList.add('bg-red-500', 'hover:bg-red-600');
-                    setTimeout(() => {
-                        submitBtn.textContent = originalText;
-                        submitBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
-                    }, 2000);
+                    setTimeout(() => { submitBtn.textContent = originalText; }, 2000);
                     return;
                 }
 
-                // Convert Set to a sorted array
-                const availabilityArray = Array.from(selectedDates).sort();
-
-                const jsonData = {
-                    "availableDates": availabilityArray
-                };
-
-                // Create the mailto link with JSON in the body
+                const submissionArray = Array.from(datesToSubmit).sort();
+                const jsonData = { [jsonKey]: submissionArray };
                 const email = '100ARW.RoyalSpark@us.af.mil';
-                const subject = 'Pilot Availability Submission';
-                const body = `Pilot availability report:\n\n${JSON.stringify(jsonData, null, 2)}`;
-                
-                // URL encode the subject and body for the mailto link
+                const subject = `Pilot ${subjectType} Submission`;
+                const body = `Pilot ${subjectType} report:\n\n${JSON.stringify(jsonData, null, 2)}`;
                 const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-                // Open the user's default email client
                 window.location.href = mailtoLink;
             });
 
             // --- Initialization ---
             createCalendar(currentYear, currentMonth); // Current month
             createCalendar(currentYear, currentMonth + 1); // Next month
+            updateTabStyles();
         });
     </script>
 </body>
