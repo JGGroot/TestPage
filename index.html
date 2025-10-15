@@ -3,525 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warehouse Part Logger</title>
+    <title>Pilot Availability Selector</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;70,00&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Disable tap highlight on mobile */
         }
-        .input-focus:focus {
-            box-shadow: 0 0 0 2px #3b82f6;
-            outline: none;
+        .calendar-table {
+            border-collapse: separate;
+            border-spacing: 0.25rem; /* space between cells */
         }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .calendar-day {
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
         }
-        ::-webkit-scrollbar-track {
-            background: #27272a;
+        .calendar-day.selectable:hover {
+            background-color: #dbeafe; /* light blue on hover */
         }
-        ::-webkit-scrollbar-thumb {
-            background: #52525b;
-            border-radius: 4px;
+        .calendar-day.selected {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            font-weight: 600;
+            transform: scale(1.05);
+            border-radius: 9999px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #71717a;
-        }
-        .modal {
-            transition: opacity 0.25s ease;
-        }
-        /* Hide number input spinners on all browsers */
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
+        .calendar-day.past {
+            color: #9ca3af; /* gray-400 */
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <!-- Name Input Modal -->
-    <div id="name-modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-95 flex items-center justify-center z-50 hidden">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-sm text-center">
-            <form id="name-form">
-                <h2 class="text-2xl font-bold text-white mb-4">Enter Your Name</h2>
-                <p class="text-gray-400 mb-6">Please enter your name to start logging.</p>
-                <input type="text" id="name-input" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus transition duration-200 mb-6" placeholder="Your Name">
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-md">
-                    Start Logging
-                </button>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Edit Entry Modal -->
-    <div id="edit-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-8 w-full max-w-lg text-left">
-            <h2 class="text-2xl font-bold text-white mb-6">Edit Log Entry</h2>
-            <form id="edit-form">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="edit-asset-id" class="block text-sm font-medium text-gray-300 mb-1">Asset ID</label>
-                        <input type="text" id="edit-asset-id" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white input-focus">
-                    </div>
-                    <div>
-                        <label for="edit-storage-location" class="block text-sm font-medium text-gray-300 mb-1">Storage Location</label>
-                        <input type="text" id="edit-storage-location" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white input-focus">
-                    </div>
-                    <div>
-                        <label for="edit-quantity-added" class="block text-sm font-medium text-gray-300 mb-1">Quantity Added</label>
-                        <input type="number" id="edit-quantity-added" required min="1" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white input-focus numpad-trigger">
-                    </div>
-                    <div>
-                        <label for="edit-total-quantity" class="block text-sm font-medium text-gray-300 mb-1">New Total Quantity</label>
-                        <input type="number" id="edit-total-quantity" required min="0" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white input-focus numpad-trigger">
-                    </div>
-                </div>
-                <div class="flex justify-end gap-4 mt-8">
-                    <button type="button" id="edit-cancel" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Cancel</button>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Clear Log Confirmation Modal -->
-    <div id="clear-log-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
-            <h3 class="text-lg font-bold text-white mb-4">Clear All Log Entries?</h3>
-            <p class="text-gray-300 mb-4">This is irreversible. To confirm, please type <strong class="text-red-400">CLEAR</strong> in the box below.</p>
-            <input type="text" id="clear-confirm-input" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus transition duration-200 mb-4" placeholder="Type CLEAR to confirm">
-            <div class="flex justify-center gap-4">
-                <button id="clear-log-confirm" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 opacity-50 cursor-not-allowed" disabled>Confirm</button>
-                <button id="clear-log-cancel" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Cancel</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Mobile Numpad Modal -->
-    <div id="numpad-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-end justify-center hidden z-50 sm:hidden">
-        <div class="bg-gray-800 w-full rounded-t-2xl shadow-xl p-4 flex flex-col">
-             <div id="numpad-display" class="bg-gray-900 text-white text-4xl text-right rounded-lg px-4 py-3 mb-4 font-mono">0</div>
-             <div id="numpad-buttons" class="grid grid-cols-4 gap-2">
-                 <button data-key="1" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">1</button>
-                 <button data-key="2" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">2</button>
-                 <button data-key="3" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">3</button>
-                 <button data-key="backspace" class="text-2xl bg-gray-700/80 hover:bg-gray-600 rounded-lg p-4 transition duration-200 flex justify-center items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 002.828 0L21 12M3 12l6.414-6.414a2 2 0 012.828 0L21 12" /></svg>
-                 </button>
-                 <button data-key="4" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">4</button>
-                 <button data-key="5" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">5</button>
-                 <button data-key="6" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">6</button>
-                 <button id="numpad-cancel" class="text-xl bg-red-600/80 hover:bg-red-500 rounded-lg p-4 transition duration-200 font-bold">Cancel</button>
-                 <button data-key="7" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">7</button>
-                 <button data-key="8" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">8</button>
-                 <button data-key="9" class="numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">9</button>
-                 <button id="numpad-done" class="row-span-2 text-xl bg-green-600 hover:bg-green-500 rounded-lg p-4 transition duration-200 font-bold">Done</button>
-                 <button data-key="0" class="col-span-3 numpad-btn text-2xl bg-gray-700 hover:bg-gray-600 rounded-lg p-4 transition duration-200">0</button>
-             </div>
-        </div>
-    </div>
-
-
-    <div class="w-full max-w-6xl">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-white">Warehouse Part Logger</h1>
-            <p class="text-gray-400 mt-2">Scan asset and location barcodes to log inventory updates.</p>
-            <p id="user-display" class="text-gray-400 mt-2 text-sm"></p>
-        </header>
-
-        <!-- Main Form for Logging -->
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
-            <form id="log-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                <div class="md:col-span-1">
-                    <label for="asset-id" class="block text-sm font-medium text-gray-300 mb-1">Asset ID</label>
-                    <input type="text" id="asset-id" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus transition duration-200" placeholder="Scan Part Barcode">
-                </div>
-                <div class="md-col-span-1">
-                    <label for="storage-location" class="block text-sm font-medium text-gray-300 mb-1">Storage Location</label>
-                    <input type="text" id="storage-location" required class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus transition duration-200" placeholder="Scan Location Barcode">
-                </div>
-                <div>
-                    <label for="quantity-added" class="block text-sm font-medium text-gray-300 mb-1">Quantity Added</label>
-                    <input type="number" id="quantity-added" required min="1" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus numpad-trigger" placeholder="e.g., 5">
-                </div>
-                <div>
-                    <label for="total-quantity" class="block text-sm font-medium text-gray-300 mb-1">New Total Quantity</label>
-                    <input type="number" id="total-quantity" required min="0" class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 input-focus numpad-trigger" placeholder="e.g., 25">
-                </div>
-                <button type="submit" class="md:col-span-2 lg:col-span-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-md mt-4">
-                    Add Log Entry
-                </button>
-            </form>
+    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6 space-y-6 m-4">
+        <!-- Header Section -->
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800 text-center">Pilot Availability</h1>
+            <p class="text-center text-gray-500 mt-1">Tap the dates you are available to fly.</p>
         </div>
 
-        <!-- Log Display and Controls -->
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-white mb-4 sm:mb-0">Log Entries</h2>
-                <div class="flex gap-2">
-                    <button id="export-csv" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Export to CSV</button>
-                    <button id="clear-log" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-300">Clear Log</button>
-                </div>
-            </div>
-            <div class="overflow-x-auto max-h-96 rounded-lg border border-gray-700">
-                <table class="min-w-full divide-y divide-gray-700">
-                    <thead class="bg-gray-700 sticky top-0">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Asset ID</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Storage Location</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Qty Added</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">New Total</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Logged By</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Timestamp</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="log-table-body" class="bg-gray-800 divide-y divide-gray-700">
-                         <tr id="placeholder-row">
-                            <td colspan="7" class="px-6 py-10 text-center text-gray-400">No entries yet. Scan an item to begin.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <!-- Calendars Container -->
+        <div id="calendars-container" class="space-y-6">
+            <!-- Calendars will be dynamically inserted here -->
         </div>
-    </div>
-    
-    <!-- Custom Modal for Confirmation -->
-    <div id="confirmation-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
-        <div class="bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
-            <h3 class="text-lg font-bold text-white mb-4" id="modal-title">Are you sure?</h3>
-            <p class="text-gray-300 mb-6" id="modal-message">This action cannot be undone.</p>
-            <div class="flex justify-center gap-4">
-                <button id="modal-confirm" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Confirm</button>
-                <button id="modal-cancel" class="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Cancel</button>
-            </div>
-        </div>
-    </div>
 
+        <!-- Action Button -->
+        <button id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Submit Availability
+        </button>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const getEl = (id) => document.getElementById(id);
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarsContainer = document.getElementById('calendars-container');
+            const submitBtn = document.getElementById('submit-btn');
+
+            // Use a Set for efficient add/delete of selected dates
+            const selectedDates = new Set();
             
-            // --- DOM Elements ---
-            const logForm = getEl('log-form');
-            const assetIdInput = getEl('asset-id');
-            const storageLocationInput = getEl('storage-location');
-            const quantityAddedInput = getEl('quantity-added');
-            const totalQuantityInput = getEl('total-quantity');
-            const logTableBody = getEl('log-table-body');
-            const exportBtn = getEl('export-csv');
-            const clearBtn = getEl('clear-log');
-            const placeholderRow = getEl('placeholder-row');
-            
-            const nameModal = getEl('name-modal');
-            const nameForm = getEl('name-form');
-            const nameInput = getEl('name-input');
-            const userDisplay = getEl('user-display');
+            // --- Date and Time Configuration ---
+            // Set a fixed date for consistent output based on the prompt's context.
+            // In a live scenario, you would use 'new Date()'.
+            const today = new Date('2025-10-15T12:00:00Z');
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth(); // 0-indexed (October is 9)
 
-            const confirmationModal = getEl('confirmation-modal');
-            const modalConfirmBtn = getEl('modal-confirm');
-            const modalCancelBtn = getEl('modal-cancel');
+            /**
+             * Generates and appends a calendar for a given month and year.
+             * @param {number} year - The full year (e.g., 2025)
+             * @param {number} month - The month, 0-indexed (e.g., 9 for October)
+             */
+            function createCalendar(year, month) {
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const daysOfWeek = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
-            const editModal = getEl('edit-modal');
-            const editForm = getEl('edit-form');
-            const editAssetIdInput = getEl('edit-asset-id');
-            const editStorageLocationInput = getEl('edit-storage-location');
-            const editQuantityAddedInput = getEl('edit-quantity-added');
-            const editTotalQuantityInput = getEl('edit-total-quantity');
-            const editCancelBtn = getEl('edit-cancel');
+                const calendarWrapper = document.createElement('div');
+                
+                // --- Calendar Header ---
+                const header = document.createElement('h2');
+                header.className = 'text-lg font-semibold text-center text-gray-700';
+                header.textContent = `${monthNames[month]} ${year}`;
+                calendarWrapper.appendChild(header);
 
-            const clearLogModal = getEl('clear-log-modal');
-            const clearConfirmInput = getEl('clear-confirm-input');
-            const clearLogConfirmBtn = getEl('clear-log-confirm');
-            const clearLogCancelBtn = getEl('clear-log-cancel');
-
-            // Numpad Modal elements
-            const numpadModal = getEl('numpad-modal');
-            const numpadDisplay = getEl('numpad-display');
-            const numpadButtons = getEl('numpad-buttons');
-            const numpadCancelBtn = getEl('numpad-cancel');
-            const numpadDoneBtn = getEl('numpad-done');
-
-
-            // --- STATE ---
-            let logEntries = JSON.parse(localStorage.getItem('warehouseLogEntries')) || [];
-            let currentUser = '';
-            let currentlyEditingIndex = null;
-            let activeNumpadInput = null;
-
-            // --- HELPERS ---
-            const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
-
-            // --- USER NAME MANAGEMENT ---
-            const setupUser = () => {
-                currentUser = localStorage.getItem('warehouseCurrentUser');
-                if (!currentUser) {
-                    nameModal.classList.remove('hidden');
-                    nameInput.focus();
-                } else {
-                    updateUserDisplay();
-                }
-            };
-            
-            const updateUserDisplay = () => {
-                userDisplay.innerHTML = `Logged in as: <strong class="text-white">${currentUser}</strong> <button id="change-user-btn" class="text-blue-400 hover:underline ml-2 font-semibold">Change</button>`;
-                getEl('change-user-btn').addEventListener('click', () => {
-                     nameModal.classList.remove('hidden');
-                     nameInput.focus();
+                // --- Calendar Table ---
+                const table = document.createElement('table');
+                table.className = 'w-full calendar-table mt-2';
+                
+                // --- Day of Week Headers ---
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                daysOfWeek.forEach(day => {
+                    const th = document.createElement('th');
+                    th.className = 'text-xs text-gray-500 font-medium';
+                    th.textContent = day;
+                    headerRow.appendChild(th);
                 });
-            };
-            
-            nameForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const enteredName = nameInput.value.trim();
-                if (enteredName) {
-                    currentUser = enteredName;
-                    localStorage.setItem('warehouseCurrentUser', currentUser);
-                    updateUserDisplay();
-                    nameModal.classList.add('hidden');
-                    assetIdInput.focus();
-                }
-            });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
 
-            // --- LOCAL STORAGE & RENDER ---
-            const saveAndRender = () => {
-                localStorage.setItem('warehouseLogEntries', JSON.stringify(logEntries));
-                renderTable();
-            };
-            
-            const renderTable = () => {
-                logTableBody.innerHTML = '';
-                if (logEntries.length === 0) {
-                   logTableBody.appendChild(placeholderRow);
-                } else {
-                    logEntries.forEach((entry, index) => {
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-gray-700/50 transition-colors duration-200';
-                        row.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">${entry.assetId}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.storageLocation}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.quantityAdded}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.totalQuantity}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.userName}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">${entry.timestamp}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
-                                <button class="edit-btn text-blue-400 hover:text-blue-300" data-index="${index}">Edit</button>
-                                <button class="delete-btn text-red-400 hover:text-red-300 ml-4" data-index="${index}">Delete</button>
-                            </td>
-                        `;
-                        logTableBody.appendChild(row);
-                    });
-                }
-            };
-            
-            // --- MODAL LOGIC ---
-            let confirmCallback = null;
-            const showConfirmationModal = (message, onConfirm) => {
-                getEl('modal-message').textContent = message;
-                confirmCallback = onConfirm;
-                confirmationModal.classList.remove('hidden');
-            };
+                // --- Calendar Body (Days) ---
+                const tbody = document.createElement('tbody');
+                const firstDay = new Date(year, month, 1).getDay(); // Day of week for the 1st
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            const hideConfirmationModal = () => {
-                confirmationModal.classList.add('hidden');
-                confirmCallback = null;
-            };
+                let date = 1;
+                for (let i = 0; i < 6; i++) { // Max 6 rows for a month
+                    const row = document.createElement('tr');
+                    for (let j = 0; j < 7; j++) {
+                        const cell = document.createElement('td');
+                        cell.className = 'calendar-day text-center w-10 h-10 p-1 cursor-pointer rounded-full';
 
-            modalConfirmBtn.addEventListener('click', () => {
-                if(confirmCallback) confirmCallback();
-                hideConfirmationModal();
-            });
-
-            modalCancelBtn.addEventListener('click', hideConfirmationModal);
-
-            // --- NUMPAD LOGIC ---
-            const showNumpad = (initialValue) => {
-                numpadDisplay.textContent = initialValue || '0';
-                numpadModal.classList.remove('hidden');
-            };
-
-            const hideNumpad = () => {
-                numpadModal.classList.add('hidden');
-                activeNumpadInput = null;
-            };
-
-            const setupNumpadTriggers = () => {
-                document.querySelectorAll('.numpad-trigger').forEach(input => {
-                    const handleFocus = (e) => {
-                        if (isMobile()) {
-                            e.preventDefault();
-                            document.activeElement.blur(); // Prevent keyboard
-                            activeNumpadInput = e.target;
-                            showNumpad(e.target.value);
+                        if (i === 0 && j < firstDay) {
+                            // Empty cells before the 1st day of the month
+                            cell.classList.remove('cursor-pointer');
+                        } else if (date > daysInMonth) {
+                            // Stop after the last day of the month
+                            cell.classList.remove('cursor-pointer');
+                        } else {
+                            // --- Fill in the date ---
+                            const currentDate = new Date(year, month, date);
+                            cell.textContent = date;
+                            
+                            // Check if the date is in the past
+                            if (currentDate < today && currentDate.toDateString() !== today.toDateString()) {
+                                cell.classList.add('past');
+                                cell.classList.remove('cursor-pointer');
+                            } else {
+                                cell.classList.add('selectable');
+                                const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                                cell.dataset.date = dateString; // Store date in YYYY-MM-DD format
+                            }
+                            date++;
                         }
-                    };
-                    input.removeEventListener('focus', handleFocus); // Prevent multiple listeners
-                    input.addEventListener('focus', handleFocus);
-                });
-            };
+                        row.appendChild(cell);
+                    }
+                    tbody.appendChild(row);
+                    if (date > daysInMonth) break; // Exit loop if all dates are rendered
+                }
+                table.appendChild(tbody);
+                calendarWrapper.appendChild(table);
+                calendarsContainer.appendChild(calendarWrapper);
+            }
 
-            numpadButtons.addEventListener('click', (e) => {
-                const button = e.target.closest('button');
-                if (!button) return;
-                const key = button.dataset.key;
-                if (!key) return;
-
-                let currentValue = numpadDisplay.textContent;
-                if (key === 'backspace') {
-                    numpadDisplay.textContent = currentValue.length > 1 ? currentValue.slice(0, -1) : '0';
-                } else if (/\d/.test(key)) {
-                    numpadDisplay.textContent = currentValue === '0' ? key : currentValue + key;
+            // --- Event Handling ---
+            calendarsContainer.addEventListener('click', function(e) {
+                const target = e.target;
+                if (target.classList.contains('selectable') && !target.classList.contains('past')) {
+                    const date = target.dataset.date;
+                    target.classList.toggle('selected');
+                    if (selectedDates.has(date)) {
+                        selectedDates.delete(date);
+                    } else {
+                        selectedDates.add(date);
+                    }
                 }
             });
 
-            numpadDoneBtn.addEventListener('click', () => {
-                if (activeNumpadInput) {
-                    activeNumpadInput.value = numpadDisplay.textContent;
-                }
-                hideNumpad();
-            });
-
-            numpadCancelBtn.addEventListener('click', hideNumpad);
-
-            // --- EVENT LISTENERS ---
-            logForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if (!currentUser) {
-                    nameModal.classList.remove('hidden');
-                    nameInput.focus();
+            submitBtn.addEventListener('click', function() {
+                if (selectedDates.size === 0) {
+                    alert('Please select at least one date before submitting.');
                     return;
                 }
-                const newEntry = {
-                    assetId: assetIdInput.value.trim(),
-                    storageLocation: storageLocationInput.value.trim(),
-                    quantityAdded: quantityAddedInput.value,
-                    totalQuantity: totalQuantityInput.value,
-                    userName: currentUser,
-                    timestamp: new Date().toLocaleString()
+
+                // Convert Set to a sorted array
+                const availabilityArray = Array.from(selectedDates).sort();
+
+                const jsonData = {
+                    "availableDates": availabilityArray
                 };
-                logEntries.unshift(newEntry);
-                saveAndRender();
-                logForm.reset();
-                assetIdInput.focus();
+
+                // Create the mailto link with JSON in the body
+                const email = '100ARW.RoyalSpark@us.af.mil';
+                const subject = 'Pilot Availability Submission';
+                const body = `Pilot availability report:\n\n${JSON.stringify(jsonData, null, 2)}`;
+                
+                // URL encode the subject and body for the mailto link
+                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+                // Open the user's default email client
+                window.location.href = mailtoLink;
             });
 
-            logTableBody.addEventListener('click', (e) => {
-                if (e.target.classList.contains('delete-btn')) {
-                    const index = e.target.dataset.index;
-                    showConfirmationModal(`Are you sure you want to delete the entry for asset "${logEntries[index].assetId}"?`, () => {
-                        logEntries.splice(index, 1);
-                        saveAndRender();
-                    });
-                }
-                if (e.target.classList.contains('edit-btn')) {
-                    currentlyEditingIndex = e.target.dataset.index;
-                    const entry = logEntries[currentlyEditingIndex];
-                    editAssetIdInput.value = entry.assetId;
-                    editStorageLocationInput.value = entry.storageLocation;
-                    editQuantityAddedInput.value = entry.quantityAdded;
-                    editTotalQuantityInput.value = entry.totalQuantity;
-                    editModal.classList.remove('hidden');
-                    setupNumpadTriggers(); // Re-init for edit modal inputs
-                }
-            });
-
-            editForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const updatedEntry = {
-                    ...logEntries[currentlyEditingIndex],
-                    assetId: editAssetIdInput.value.trim(),
-                    storageLocation: editStorageLocationInput.value.trim(),
-                    quantityAdded: editQuantityAddedInput.value,
-                    totalQuantity: editTotalQuantityInput.value,
-                };
-                logEntries[currentlyEditingIndex] = updatedEntry;
-                saveAndRender();
-                editModal.classList.add('hidden');
-                currentlyEditingIndex = null;
-            });
-
-            editCancelBtn.addEventListener('click', () => {
-                editModal.classList.add('hidden');
-                currentlyEditingIndex = null;
-            });
-
-            exportBtn.addEventListener('click', () => {
-                if (logEntries.length === 0) {
-                    showConfirmationModal("Log is empty. Nothing to export.", () => {});
-                    getEl('modal-title').textContent = "Info";
-                    modalConfirmBtn.style.display = 'none';
-                    modalCancelBtn.textContent = 'Close';
-
-                    const observer = new MutationObserver(() => {
-                         if (confirmationModal.classList.contains('hidden')) {
-                             getEl('modal-title').textContent = "Are you sure?";
-                             modalConfirmBtn.style.display = 'inline-flex';
-                             modalCancelBtn.textContent = 'Cancel';
-                             observer.disconnect();
-                         }
-                     });
-                     observer.observe(confirmationModal, { attributes: true, attributeFilter: ['class'] });
-                    return;
-                }
-                const headers = ['Asset ID', 'Storage Location', 'Quantity Added', 'Total Quantity', 'Logged By', 'Timestamp'];
-                const csvContent = [
-                    headers.join(','),
-                    ...logEntries.map(e => [
-                        `"${e.assetId}"`, `"${e.storageLocation}"`, e.quantityAdded, e.totalQuantity, `"${e.userName}"`, `"${e.timestamp}"`
-                    ].join(','))
-                ].join('\n');
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `warehouse_log_${new Date().toISOString().slice(0, 10)}.csv`;
-                link.click();
-            });
-            
-            clearBtn.addEventListener('click', () => {
-                if (logEntries.length === 0) return;
-                clearLogModal.classList.remove('hidden');
-                clearConfirmInput.focus();
-            });
-
-            clearConfirmInput.addEventListener('input', () => {
-                if (clearConfirmInput.value === 'CLEAR') {
-                    clearLogConfirmBtn.disabled = false;
-                    clearLogConfirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                } else {
-                    clearLogConfirmBtn.disabled = true;
-                    clearLogConfirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                }
-            });
-
-            clearLogConfirmBtn.addEventListener('click', () => {
-                logEntries = [];
-                saveAndRender();
-                clearLogModal.classList.add('hidden');
-                clearConfirmInput.value = '';
-                clearLogConfirmBtn.disabled = true;
-                clearLogConfirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            });
-
-            clearLogCancelBtn.addEventListener('click', () => {
-                clearLogModal.classList.add('hidden');
-                clearConfirmInput.value = '';
-                 clearLogConfirmBtn.disabled = true;
-                clearLogConfirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            });
-            
-            // --- INITIALIZATION ---
-            setupUser();
-            renderTable();
-            setupNumpadTriggers();
+            // --- Initialization ---
+            createCalendar(currentYear, currentMonth); // Current month
+            createCalendar(currentYear, currentMonth + 1); // Next month
         });
     </script>
 </body>
 </html>
-
-
