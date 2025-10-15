@@ -116,7 +116,7 @@
         <div id="menu-modal" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
         <div id="menu-content" class="fixed top-0 right-0 h-full w-64 bg-slate-800 shadow-lg z-50 p-4 transform translate-x-full">
              <h2 class="text-lg font-semibold text-white mb-4">Menu</h2>
-             <button id="change-name-btn" class="w-full text-left py-2 px-3 rounded-md hover:bg-slate-700 text-slate-300">Change Name</button>
+             <button id="change-name-btn" class="w-full text-left py-2 px-3 rounded-md hover:bg-slate-700 text-slate-300">Set Name</button>
         </div>
 
     </div>
@@ -167,7 +167,7 @@
                 if (pilotName) {
                     changeNameBtn.textContent = 'Change Name';
                 } else {
-                    changeNameBtn.textContent = 'Set Name (Required)';
+                    changeNameBtn.textContent = 'Set Name';
                 }
             }
 
@@ -299,19 +299,6 @@
             });
 
             submitBtn.addEventListener('click', function() {
-                if (!pilotName) {
-                    // **MODIFIED LOGIC**
-                    // Do NOT show the setup screen. Instead, prompt the user to use the menu.
-                    const originalText = submitBtn.textContent;
-                    submitBtn.textContent = 'Set Name in Menu First!';
-                    menuBtn.classList.add('ring-2', 'ring-emerald-500', 'shadow-lg');
-                    setTimeout(() => { 
-                        submitBtn.textContent = originalText;
-                        menuBtn.classList.remove('ring-2', 'ring-emerald-500', 'shadow-lg');
-                    }, 3000);
-                    return;
-                }
-
                 if (selectedDates.size === 0 && unavailableDates.size === 0) {
                     const originalText = submitBtn.textContent;
                     submitBtn.textContent = 'Please select at least one date!';
@@ -319,7 +306,11 @@
                     return;
                 }
 
-                const jsonData = { pilotName: pilotName };
+                const jsonData = {};
+                if (pilotName) {
+                    jsonData.pilotName = pilotName;
+                }
+
                 if (selectedDates.size > 0) {
                     jsonData.availableDates = Array.from(selectedDates).sort();
                 }
@@ -328,7 +319,7 @@
                 }
 
                 const email = '100ARW.RoyalSpark@us.af.mil';
-                const subject = `Pilot Availability Submission - ${pilotName}`;
+                const subject = pilotName ? `Pilot Availability Submission - ${pilotName}` : 'Pilot Availability Submission';
                 const body = `Pilot availability and unavailability report:\n\n${JSON.stringify(jsonData, null, 2)}`;
                 const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                 window.location.href = mailtoLink;
