@@ -162,7 +162,14 @@
 
             submitBtn.addEventListener('click', function() {
                 if (selectedDates.size === 0) {
-                    alert('Please select at least one date before submitting.');
+                    // Replaced alert with a more modern, non-blocking notification.
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Please select a date first!';
+                    submitBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+                    setTimeout(() => {
+                        submitBtn.textContent = originalText;
+                        submitBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    }, 2000);
                     return;
                 }
 
@@ -173,16 +180,16 @@
                     "availableDates": availabilityArray
                 };
 
-                // Create the mailto link with JSON in the body
-                const email = '100ARW.RoyalSpark@us.af.mil';
-                const subject = 'Pilot Availability Submission';
+                // Create the sms link with JSON in the body
+                const emailRecipient = '100ARW.RoyalSpark@us.af.mil';
                 const body = `Pilot availability report:\n\n${JSON.stringify(jsonData, null, 2)}`;
                 
-                // URL encode the subject and body for the mailto link
-                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                // On modern devices, the sms: protocol can handle email addresses.
+                // This will open the default messaging app.
+                const smsLink = `sms:${emailRecipient}?body=${encodeURIComponent(body)}`;
 
-                // Open the user's default email client
-                window.location.href = mailtoLink;
+                // Open the user's default messaging client
+                window.location.href = smsLink;
             });
 
             // --- Initialization ---
@@ -192,3 +199,4 @@
     </script>
 </body>
 </html>
+
