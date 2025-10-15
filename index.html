@@ -10,6 +10,7 @@
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
+            outline: none;
         }
         .calendar-table {
             border-collapse: separate;
@@ -17,6 +18,9 @@
         }
         .calendar-day {
             transition: all 0.2s ease-in-out;
+        }
+        .calendar-day:focus {
+            outline: none;
         }
         .calendar-day.selectable:hover {
             background-color: #334155; /* slate-700 on hover */
@@ -120,7 +124,6 @@
                 }
                 nameForm.classList.add('hidden');
                 nameDisplay.classList.remove('hidden');
-                // Re-attach listener as innerHTML removes it
                 document.getElementById('set-name-btn').addEventListener('click', toggleNameForm);
             }
 
@@ -252,22 +255,24 @@
                     return;
                 }
 
-                const datesToSubmit = activeTab === 'available' ? selectedDates : unavailableDates;
-                const subjectType = activeTab === 'available' ? 'Availability' : 'Unavailability';
-                const jsonKey = activeTab === 'available' ? 'availableDates' : 'unavailableDates';
-
-                if (datesToSubmit.size === 0) {
+                if (selectedDates.size === 0 && unavailableDates.size === 0) {
                     const originalText = submitBtn.textContent;
-                    submitBtn.textContent = 'Please select a date first!';
+                    submitBtn.textContent = 'Please select at least one date!';
                     setTimeout(() => { submitBtn.textContent = originalText; }, 2000);
                     return;
                 }
 
-                const submissionArray = Array.from(datesToSubmit).sort();
-                const jsonData = { pilotName: pilotName, [jsonKey]: submissionArray };
+                const jsonData = { pilotName: pilotName };
+                if (selectedDates.size > 0) {
+                    jsonData.availableDates = Array.from(selectedDates).sort();
+                }
+                if (unavailableDates.size > 0) {
+                    jsonData.unavailableDates = Array.from(unavailableDates).sort();
+                }
+
                 const email = '100ARW.RoyalSpark@us.af.mil';
-                const subject = `Pilot ${subjectType} Submission - ${pilotName}`;
-                const body = `Pilot ${subjectType} report:\n\n${JSON.stringify(jsonData, null, 2)}`;
+                const subject = `Pilot Availability Submission - ${pilotName}`;
+                const body = `Pilot availability and unavailability report:\n\n${JSON.stringify(jsonData, null, 2)}`;
                 const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
                 window.location.href = mailtoLink;
             });
