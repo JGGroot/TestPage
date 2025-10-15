@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pilot Availability Selector</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;70,00&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -16,31 +16,38 @@
             border-spacing: 0.25rem; /* space between cells */
         }
         .calendar-day {
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+            transition: all 0.2s ease-in-out;
         }
         .calendar-day.selectable:hover {
-            background-color: #dbeafe; /* light blue on hover */
+            background-color: #334155; /* slate-700 on hover */
         }
         .calendar-day.selected {
-            background-color: #3b82f6; /* blue-500 */
+            background-color: #059669; /* emerald-600 */
             color: white;
             font-weight: 600;
             transform: scale(1.05);
             border-radius: 9999px;
+            box-shadow: 0 0 15px rgba(5, 150, 105, 0.5);
         }
         .calendar-day.past {
-            color: #9ca3af; /* gray-400 */
+            color: #475569; /* slate-600 */
             pointer-events: none;
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-slate-900 text-slate-300 flex items-center justify-center min-h-screen">
 
-    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6 space-y-6 m-4">
+    <div class="w-full max-w-md mx-auto bg-slate-800 rounded-2xl shadow-lg p-6 space-y-6 m-4 border border-slate-700">
         <!-- Header Section -->
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800 text-center">Pilot Availability</h1>
-            <p class="text-center text-gray-500 mt-1">Tap the dates you are available to fly.</p>
+        <div class="space-y-2">
+             <!-- Icon -->
+            <div class="text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-semibold text-slate-100 text-center">Pilot Availability</h1>
+            <p class="text-center text-slate-400 mt-1">Select your available flight days.</p>
         </div>
 
         <!-- Calendars Container -->
@@ -49,8 +56,8 @@
         </div>
 
         <!-- Action Button -->
-        <button id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            Submit Availability
+        <button id="submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 focus:ring-offset-slate-800">
+            Submit
         </button>
     </div>
 
@@ -63,11 +70,12 @@
             const selectedDates = new Set();
             
             // --- Date and Time Configuration ---
-            // Set a fixed date for consistent output based on the prompt's context.
-            // In a live scenario, you would use 'new Date()'.
-            const today = new Date('2025-10-15T12:00:00Z');
+            // Use the actual current date for the user.
+            const today = new Date();
+            // Set time to 0 to ensure whole-day comparisons work correctly
+            today.setHours(0, 0, 0, 0); 
             const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth(); // 0-indexed (October is 9)
+            const currentMonth = today.getMonth();
 
             /**
              * Generates and appends a calendar for a given month and year.
@@ -82,7 +90,7 @@
                 
                 // --- Calendar Header ---
                 const header = document.createElement('h2');
-                header.className = 'text-lg font-semibold text-center text-gray-700';
+                header.className = 'text-lg font-semibold text-center text-slate-200';
                 header.textContent = `${monthNames[month]} ${year}`;
                 calendarWrapper.appendChild(header);
 
@@ -95,7 +103,7 @@
                 const headerRow = document.createElement('tr');
                 daysOfWeek.forEach(day => {
                     const th = document.createElement('th');
-                    th.className = 'text-xs text-gray-500 font-medium';
+                    th.className = 'text-xs text-slate-400 font-medium';
                     th.textContent = day;
                     headerRow.appendChild(th);
                 });
@@ -126,7 +134,7 @@
                             cell.textContent = date;
                             
                             // Check if the date is in the past
-                            if (currentDate < today && currentDate.toDateString() !== today.toDateString()) {
+                            if (currentDate < today) {
                                 cell.classList.add('past');
                                 cell.classList.remove('cursor-pointer');
                             } else {
@@ -180,16 +188,16 @@
                     "availableDates": availabilityArray
                 };
 
-                // Create the sms link with JSON in the body
-                const emailRecipient = '100ARW.RoyalSpark@us.af.mil';
+                // Create the mailto link with JSON in the body
+                const email = '100ARW.RoyalSpark@us.af.mil';
+                const subject = 'Pilot Availability Submission';
                 const body = `Pilot availability report:\n\n${JSON.stringify(jsonData, null, 2)}`;
                 
-                // On modern devices, the sms: protocol can handle email addresses.
-                // This will open the default messaging app.
-                const smsLink = `sms:${emailRecipient}?body=${encodeURIComponent(body)}`;
+                // URL encode the subject and body for the mailto link
+                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-                // Open the user's default messaging client
-                window.location.href = smsLink;
+                // Open the user's default email client
+                window.location.href = mailtoLink;
             });
 
             // --- Initialization ---
